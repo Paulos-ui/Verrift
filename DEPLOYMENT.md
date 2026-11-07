@@ -1,12 +1,15 @@
 # VERRIFT | GitHub, Supabase and Vercel deployment
 
+> **Updated deployment layout:** For fixes to the November 7 Vercel `FUNCTION_INVOCATION_FAILED`, follow `VERCEL_HOTFIX.md` first. The old root-level `server.js` must be removed from already-extracted repositories, because unzip does not remove old files. The local server now lives at `scripts/dev-server.js`; production uses `api/index.js` and `public/`.
+
 ## 1. Source on your Windows Desktop
 
 The project is extracted into `/mnt/c/Users/MY PC/Desktop/verrift` in WSL Ubuntu. The ZIP below is source-only and does not include `.env`, databases, wallets, or generated artifacts.
 
 ```bash
 cd "/mnt/c/Users/MY PC/Desktop"
-unzip -oq "verrift-multiuser-final.zip" -d "verrift"
+unzip -oq "verrift-vercel-hotfix.zip" -d "verrift"
+rm -f "verrift/server.js"
 cd "verrift"
 npm ci
 npm run verify
@@ -80,7 +83,7 @@ You do **not** need `ADMIN_PASSWORD`, `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_R
 - Build: `npm run build`
 - Output Directory: `public`
 - Node: `22.x`
-- `vercel.json` routes `/api/*` to the serverless adapter, plus `/docs`, `/sandbox`, `/admin`, and `/report/*`.
+- The static site is served from `public/` and Vercel uses the `api/index.js` serverless function. `vercel.json` routes `/api/*`, `/docs`, `/sandbox`, `/admin`, and `/report/*`. Root `server.js` must **not** exist.
 
 Save, deploy, then open the actual Vercel URL. If you need to set `PUBLIC_ORIGIN` after deployment assigns the URL, set the variable and redeploy.
 

@@ -2,10 +2,10 @@
 
 ## Extract without mkdir (WSL)
 
-Download `verrift-multiuser-final.zip` to your Windows Desktop. This command creates the `verrift` directory automatically when needed and preserves its `.git` folder when one exists:
+Download `verrift-vercel-hotfix.zip` to your Windows Desktop. This command creates the `verrift` directory automatically when needed and preserves its `.git` folder when one exists:
 
 ```bash
-cd "/mnt/c/Users/MY PC/Desktop" && unzip -oq "verrift-multiuser-final.zip" -d "verrift" && cd "verrift"
+cd "/mnt/c/Users/MY PC/Desktop" && unzip -oq "verrift-vercel-hotfix.zip" -d "verrift" && cd "verrift"
 ```
 
 Check the code:
@@ -13,6 +13,7 @@ Check the code:
 ```bash
 npm ci
 npm run verify
+rm -f server.js  # Remove legacy Vercel auto-detected server entrypoint
 git status --short
 ```
 
