@@ -10,20 +10,34 @@ import {domainName,allowedPath,publicIp,verifyDomain,checkResponse} from '../lib
 import {ethToWei,verifyTransfer,BASE_CHAIN_ID} from '../lib/base.js';
 import {analyzeCase} from '../lib/ai.js';
 
-const password='secure-test-password-123456';const secret='secret-secret-secret-secret-secret-secret';
+const secret='secret-secret-secret-secret-secret-secret';
+const wallet2='0x'+'2'.repeat(40);
+const walletF='0x'+'f'.repeat(40);
 async function fixture(overrides={}){
  const folder=await mkdtemp(path.join(os.tmpdir(),'verrift-'));
- const store=new Store({file:path.join(folder,'state.json'),redisUrl:null,redisToken:null});
- const handle=createHandler({store,adminPassword:password,sessionSecret:secret,...overrides});
+ const store=new Store({file:path.join(folder,'state.json'),redisUrl:null,redisToken:null,supabaseUrl:null,supabaseSecret:null});
+ const authExchanger=async({message})=>({id:'test_'+(message.match(/\n(0x[a-f0-9]{40})\n/i)?.[1]||'').slice(2).toLowerCase()});
+ const handle=createHandler({store,sessionSecret:secret,authExchanger,...overrides});
  const server=http.createServer(handle);await new Promise(ok=>server.listen(0,'127.0.0.1',ok));
- const url=`http://127.0.0.1:${server.address().port}`;let cookie='';
- async function call(endpoint,method='GET',data,headers={}){
-  const response=await fetch(url+endpoint,{method,headers:{...headers,...(cookie?{cookie}:{}),...(data?{'content-type':'application/json'}:{})},body:data?JSON.stringify(data):undefined});
-  const result=await response.json();if(response.headers.get('set-cookie'))cookie=response.headers.get('set-cookie').split(';')[0];return {status:response.status,result,headers:response.headers};
+ const url=`http://127.0.0.1:${server.address().port}`;
+ function client(){
+  const jar=new Map();
+  async function call(endpoint,method='GET',data,headers={}){
+   const response=await fetch(url+endpoint,{method,headers:{...headers,...(jar.size?{cookie:[...jar].map(([k,v])=>`${k}=${v}`).join('; ')}:{}),...(data?{'content-type':'application/json'}:{})},body:data?JSON.stringify(data):undefined});
+   const result=await response.json();
+   for(const line of response.headers.getSetCookie?.()||[]){const pair=line.split(';')[0];const i=pair.indexOf('=');if(i>0){const k=pair.slice(0,i),v=pair.slice(i+1);if(v)jar.set(k,v);else jar.delete(k);}}
+   return {status:response.status,result,headers:response.headers};
+  }
+  async function login(address=wallet2){
+   await call('/api/status');
+   const q=await call('/api/auth/challenge?address='+address);assert.equal(q.status,200);
+   const x=await call('/api/auth/verify','POST',{message:q.result.message,signature:'0x'+'1'.repeat(130)});assert.equal(x.status,200);
+  }
+  return {call,login,jar};
  }
- async function login(){const x=await call('/api/login','POST',{password});assert.equal(x.status,200);}
+ const first=client();
  async function close(){await new Promise(ok=>server.close(ok));await rm(folder,{recursive:true,force:true});}
- return {url,store,call,login,close};
+ return {url,store,...first,client,close};
 }
 
 test('domain constraints reject unsafe or surprising targets',()=>{
@@ -47,15 +61,18 @@ test('response checks represent observed evidence, not simulated pass',()=>{
  assert.equal(checkResponse(base,200,'SERVICE_READY').passed,false);
  assert.equal(checkResponse({...base,status:200,body:'SERVICE_READY'},200,'SERVICE_READY').passed,true);
 });
-test('login/session/cross-origin write protection',async()=>{
+test('guest access, wallet sign-in, and cross-origin protection',async()=>{
  const f=await fixture();try{
- assert.equal((await f.call('/api/data')).status,401);
- assert.equal((await f.call('/api/login','POST',{password:'wrong'})).status,401);
- await f.login();assert.equal((await f.call('/api/data')).status,200);
- const request=await f.call('/api/sandbox','POST',{broken:true},{origin:'https://attacker.example'});
- assert.equal(request.status,403);
+ assert.equal((await f.call('/api/data')).status,200);
+ assert.equal((await f.call('/api/login','POST',{password:'legacy'})).status,404);
+ const noSig=await f.call('/api/auth/verify','POST',{message:'not a challenge',signature:'0x'+'1'.repeat(130)});
+ assert.equal(noSig.status,401);
+ await f.login();assert.equal((await f.call('/api/status')).result.actor.role,'user');
+ const attack=await f.call('/api/sandbox','POST',{broken:true},{origin:'https://attacker.example'});
+ assert.equal(attack.status,403);
  assert.equal((await f.call('/api/logout','POST')).status,200);
- assert.equal((await f.call('/api/data')).status,401);
+ assert.equal((await f.call('/api/data')).status,200);
+ assert.equal((await f.call('/api/status')).result.actor.role,'guest');
  }finally{await f.close();}
 });
 test('controlled sandbox fails, then passes with same criteria, yielding verified repair',async()=>{
@@ -126,8 +143,8 @@ test('Anthropic analysis submits bounded evidence and preserves model output',as
  await assert.rejects(analyzeCase({title:'Case'},[],{key:null}));
 });
 test('no default credentials required: weak secrets reject startup',()=>{
- assert.throws(()=>createHandler({adminPassword:'123',sessionSecret:secret}));
- assert.throws(()=>createHandler({adminPassword:password,sessionSecret:'short'}));
+ assert.throws(()=>createHandler({sessionSecret:'short'}));
+ assert.doesNotThrow(()=>createHandler({sessionSecret:secret,store:new Store({file:'/tmp/verrift-fixture.json',redisUrl:null,redisToken:null,supabaseUrl:null,supabaseSecret:null})}));
 });
 
 test('proof fingerprint binds one failed and subsequent passing evidence; changes with evidence',async()=>{
@@ -148,14 +165,14 @@ test('Base proof anchor validates self-recipient, zero value and exact onchain i
 });
 test('no anchor can be created without a prior failed and passing check',async()=>{
  const f=await fixture({anchorVerifier:async()=>({hash:'0x'+'a'.repeat(64)})});
- try{await f.login();const c=(await f.call('/api/cases','POST',{kind:'sandbox',title:'Anchorable case',description:'Check proof',steps:'Run twice',expectedStatus:200,expectedText:'SERVICE_READY'})).result.case;
+ try{await f.login(walletF);const c=(await f.call('/api/cases','POST',{kind:'sandbox',title:'Anchorable case',description:'Check proof',steps:'Run twice',expectedStatus:200,expectedText:'SERVICE_READY'})).result.case;
  assert.equal((await f.call(`/api/cases/${c.id}/proof`)).status,409);
  assert.equal((await f.call(`/api/cases/${c.id}/anchor`,'POST',{hash:'0x'+'a'.repeat(64),from:'0x'+'f'.repeat(40)})).status,409);
  }finally{await f.close();}
 });
 test('anchored proof can only be recorded once and appears in public report',async()=>{
  const f=await fixture({anchorVerifier:async({hash,from,digest})=>({hash,from,digest,blockNumber:19,explorer:'https://sepolia.basescan.org/tx/'+hash})});
- try{await f.login();const c=(await f.call('/api/cases','POST',{kind:'sandbox',title:'Anchorable case',description:'Check proof',steps:'Break and restore',expectedStatus:200,expectedText:'SERVICE_READY'})).result.case;
+ try{await f.login(walletF);const c=(await f.call('/api/cases','POST',{kind:'sandbox',title:'Anchorable case',description:'Check proof',steps:'Break and restore',expectedStatus:200,expectedText:'SERVICE_READY'})).result.case;
  await f.call('/api/sandbox','POST',{broken:true});await f.call(`/api/cases/${c.id}/run`,'POST',{});await f.call('/api/sandbox','POST',{broken:false});await f.call(`/api/cases/${c.id}/run`,'POST',{});
  const proof=(await f.call(`/api/cases/${c.id}/proof`)).result;assert.equal(proof.caseId,c.id);
  const record=await f.call(`/api/cases/${c.id}/anchor`,'POST',{hash:'0x'+'a'.repeat(64),from:'0x'+'f'.repeat(40)});assert.equal(record.status,200);assert.equal(record.result.anchor.digest,proof.digest);
@@ -168,16 +185,62 @@ test('public report is readable without an admin session only with its exact tok
  const f=await fixture();try{
  await f.login();const c=(await f.call('/api/cases','POST',{kind:'sandbox',title:'Published evidence',description:'Read-only report',steps:'Read tests',expectedStatus:200})).result.case;
  const s=(await f.call(`/api/cases/${c.id}/share`,'POST')).result;const raw=s.url;
- await f.call('/api/logout','POST');assert.equal((await f.call('/api/data')).status,401);
+ await f.call('/api/logout','POST');assert.equal((await f.call('/api/data')).status,200);assert.equal((await f.call('/api/data')).result.cases.length,0);
  const publicResult=await f.call(raw);assert.equal(publicResult.status,200);assert.equal(publicResult.result.case.title,'Published evidence');
  assert.equal((await f.call(`/api/public/${c.id}?token=invalid`)).status,404);
  assert.equal((await fetch(f.url+`/report/${c.id}?token=invalid`)).status,200); // static report is public; its API enforces token
  }finally{await f.close();}
 });
 
+test('two signed-in wallets cannot see or mutate each others projects and cases',async()=>{
+ const f=await fixture({domainVerifier:async()=> 'dns-txt'});try{
+ const other=f.client();await f.login(wallet2);await other.login(walletF);
+ const p=(await f.call('/api/projects','POST',{domain:'team-owned.example.com'})).result.project;
+ const c=(await f.call('/api/cases','POST',{kind:'sandbox',title:'Private case',description:'Only one owner',steps:'Run check',expectedStatus:200})).result.case;
+ assert.equal((await other.call('/api/data')).result.cases.length,0);
+ assert.equal((await other.call('/api/data')).result.projects.length,0);
+ assert.equal((await other.call(`/api/projects/${p.id}/verify`,'POST',{})).status,404);
+ assert.equal((await other.call(`/api/cases/${c.id}/run`,'POST',{})).status,404);
+ assert.equal((await other.call(`/api/export/${c.id}`)).status,404);
+ assert.equal((await f.call(`/api/cases/${c.id}/run`,'POST',{})).status,200);
+ }finally{await f.close();}
+});
+test('guest sandboxes are independent, with no access to account-only features',async()=>{
+ const f=await fixture();try{
+ const guestB=f.client();
+ await f.call('/api/status');await guestB.call('/api/status');
+ await f.call('/api/sandbox','POST',{broken:true});
+ assert.equal((await f.call('/api/sandbox/widget')).status,503);
+ assert.equal((await guestB.call('/api/sandbox/widget')).status,200);
+ assert.equal((await f.call('/api/projects','POST',{domain:'otherdomain.example.com'})).status,401);
+ const c=(await f.call('/api/cases','POST',{kind:'sandbox',title:'A demo',description:'Test isolation',steps:'Check state',expectedStatus:200})).result.case;
+ assert.equal((await f.call(`/api/cases/${c.id}/run`,'POST',{})).status,200);
+ assert.equal((await guestB.call(`/api/cases/${c.id}/run`,'POST',{})).status,404);
+ assert.equal((await f.call(`/api/cases/${c.id}/analyze`,'POST',{})).status,401);
+ }finally{await f.close();}
+});
+test('unsigned or mismatched wallet cannot record another wallet payment',async()=>{
+ const h='0x'+'c'.repeat(64);const to='0x'+'d'.repeat(40);
+ const f=await fixture({transferVerifier:async()=>({hash:h})});try{
+ await f.login(wallet2);
+ const c=(await f.call('/api/cases','POST',{kind:'sandbox',title:'Protected reward',description:'Wallet binding',steps:'Fail, fix',expectedStatus:200})).result.case;
+ await f.call('/api/sandbox','POST',{broken:true});await f.call(`/api/cases/${c.id}/run`,'POST',{});await f.call('/api/sandbox','POST',{broken:false});await f.call(`/api/cases/${c.id}/run`,'POST',{});
+ await f.call(`/api/cases/${c.id}/reward`,'POST',{to,amountEth:'0.0001'});
+ assert.equal((await f.call(`/api/cases/${c.id}/confirm-payment`,'POST',{hash:h,from:walletF})).status,403);
+ }finally{await f.close();}
+});
+test('operator summary is restricted to the configured signed-in wallet',async()=>{
+ const saved=process.env.ADMIN_WALLET_ADDRESS;process.env.ADMIN_WALLET_ADDRESS=wallet2;
+ const f=await fixture();try{
+  const other=f.client();await f.login(wallet2);await other.login(walletF);
+  const result=await f.call('/api/admin/summary');assert.equal(result.status,200);assert.equal(result.result.cases,0);
+  assert.equal((await other.call('/api/admin/summary')).status,403);
+  assert.equal((await fetch(f.url+'/admin')).status,200);
+ }finally{await f.close();if(saved===undefined)delete process.env.ADMIN_WALLET_ADDRESS;else process.env.ADMIN_WALLET_ADDRESS=saved;}
+});
 test('serverless rewrite adapter preserves declared API routes',async()=>{
- const prev1=process.env.ADMIN_PASSWORD,prev2=process.env.SESSION_SECRET;
- process.env.ADMIN_PASSWORD=password;process.env.SESSION_SECRET=secret;
+ const prev2=process.env.SESSION_SECRET;
+ process.env.SESSION_SECRET=secret;
  let server;
  try{
   const api=(await import(`../api/index.js?run=${Date.now()}`)).default;
@@ -187,7 +250,6 @@ test('serverless rewrite adapter preserves declared API routes',async()=>{
   const h=await (await fetch(root+'/api/index.js?__route=__healthz')).json();assert.equal(h.ok,true);
  }finally{
   if(server)await new Promise(done=>server.close(done));
-  if(prev1===undefined)delete process.env.ADMIN_PASSWORD;else process.env.ADMIN_PASSWORD=prev1;
   if(prev2===undefined)delete process.env.SESSION_SECRET;else process.env.SESSION_SECRET=prev2;
  }
 });

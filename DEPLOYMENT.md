@@ -1,92 +1,102 @@
-# VERRIFT | Deployment and submission guide
+# VERRIFT | GitHub, Supabase and Vercel deployment
 
-## 1. Prepare on Windows
+## 1. Source on your Windows Desktop
 
-Extract `verrift-github-ready.zip` into a **dedicated folder on your Desktop** (not inside Nightwatch or a previous hackathon repo). The name should be `verrift`.
-
-Git Bash example (adjust `MY PC` to your actual Windows account directory):
+The project is extracted into `/mnt/c/Users/MY PC/Desktop/verrift` in WSL Ubuntu. The ZIP below is source-only and does not include `.env`, databases, wallets, or generated artifacts.
 
 ```bash
-cd "/c/Users/MY PC/Desktop/verrift"
+cd "/mnt/c/Users/MY PC/Desktop"
+unzip -oq "verrift-multiuser-final.zip" -d "verrift"
+cd "verrift"
 npm ci
-npm run setup
 npm run verify
-npm run dev
 ```
 
-Open http://localhost:3000. The setup command prints the generated admin password; save it in a password manager. Keep the `.env` out of Git. Sign in and run the break → fail → restore → pass sandbox sequence. Make sure your computer uses Node 22 or later.
+## 2. Push to paulos-ui
 
-## 2. Configure Claude
+Create an empty PUBLIC repo called `verrift` at https://github.com/new under your GitHub account, unless it already exists.
 
-Sign in to the official Anthropic Console and create an API key. Add it **only** in `.env` locally and as `ANTHROPIC_API_KEY` in Vercel project Environment Variables. Choose a currently available Claude model such as `claude-sonnet-4-6` via `CLAUDE_MODEL`. In a case with evidence, click **Analyze current evidence**. Real API usage may incur charges. Never expose the key on a frontend or in a screenshot.
+If the directory is already a Git repo linked to `paulos-ui/verrift`:
 
-## 3. Configure Base Sepolia testnet
+```bash
+cd "/mnt/c/Users/MY PC/Desktop/verrift"
+git status --short
+# Confirm .env is not tracked
+git add -A
+git commit -m "Add public wallet accounts and Supabase storage"
+git push origin HEAD
+```
 
-Install or open a compatible EIP-1193 wallet (Coinbase Wallet or MetaMask). Use a **test wallet**, not a wallet holding valuable assets. VERRIFT asks the wallet to switch to Base Sepolia (84532). Fund the test wallet with **testnet ETH from a legitimate faucet** and never send mainnet ETH to a testnet address expecting it to appear on testnet.
-
-1. Connect using the header button.
-2. Record a failed run, fix, rerun and see the case status **verified**.
-3. Select **Anchor evidence on Base**. Approve a zero-value transaction to your own test wallet containing the evidence SHA-256 fingerprint. Gas is still required.
-4. Wait for confirmation. Click **Confirm proof anchor**; VERRIFT verifies the actual receipt and input using Base Sepolia RPC. If pending, retry confirmation using the same hash | do not send twice.
-5. Set recipient + test ETH reward. Approve the direct transfer in your wallet; once confirmed, verify the receipt. No escrow contract is deployed.
-
-Check the exact hash on https://sepolia.basescan.org. All actual transaction hashes must come from your wallet and be independently verifiable.
-
-## 4. Persistent storage for Vercel
-
-Use a managed Upstash Redis instance with REST API. Create a database, obtain the **REST URL** and **REST TOKEN**, and add these two values to Vercel's server-side environment variables. The application stores one JSON state object under `verrift:state:v1` using compare-and-set to reduce concurrent update conflicts. This connector has not been live-tested here.
-
-Local development uses a JSON file under `data/`, which is correctly excluded from Git. **Do not rely on local file persistence on Vercel.** The database will be empty on initial deployment, which is expected; create your cases after deploying.
-
-## 5. GitHub
-
-For a copy-paste guide with author identity checks, first-push commands and in-place updates, see [GITHUB_PUSH.md](GITHUB_PUSH.md).
-
-
-Create an empty repository named `verrift` under your `paulos-ui` GitHub account, then inside your **existing VERRIFT folder**:
+For a new repo only:
 
 ```bash
 git init
 git branch -M main
-git add -A
-git commit -m "Build VERRIFT evidence and Base testnet MVP"
 git remote add origin https://github.com/paulos-ui/verrift.git
+git add -A
+git commit -m "Launch public VERRIFT with wallet workspaces"
 git push -u origin main
 ```
 
-If you already created a repo or added a remote, preserve `.git` and run `git remote -v` before making any remote changes. Do not overwrite previous Git history.
+Do not overwrite `.git`, force-push or share API secrets.
 
-## 6. Vercel
+## 3. Add Supabase on Vercel
 
-1. Open https://vercel.com/new and import the `paulos-ui/verrift` repository.
-2. Choose **Other** as the framework preset if Vercel asks. Root directory is the project root. The project has no bundler and uses `public/` for static files and `api/index.js` for its serverless API. Build command can be empty; it is not a Next.js project.
-3. Configure `ADMIN_PASSWORD` (long random), `SESSION_SECRET` (long random), `PUBLIC_ORIGIN` (your final `https://...vercel.app` URL), `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`, `ANTHROPIC_API_KEY` (optional but strongly recommended for the demo), `CLAUDE_MODEL=claude-sonnet-4-6`, and `BASE_SEPOLIA_RPC=https://sepolia.base.org`.
-4. Set those for Production, and Preview too if you will test previews. Never set API keys as `NEXT_PUBLIC_` variables.
-5. Deploy. If Vercel gives a different URL than expected, update `PUBLIC_ORIGIN` and redeploy.
-6. Verify these pages on the actual URL: `/`, `/docs`, `/sandbox`, `/healthz`, and `/api/status`.
-7. Sign in and perform the sandbox failing/passing sequence, open a shareable `/report/...` link in a private browser window, run Claude with a real API key, and check Base receipts with a connected test wallet.
-8. Run an owner-verified external check of a domain you control. Check Vercel function logs for any errors, especially Upstash REST, DNS and routing.
+**Yes. Choose Supabase, not Redis, to power individual user accounts and their persisted cases.**
 
-**Vercel integration has not been deployed or smoke-tested in this environment.** If your Vercel plan/framework preset does not recognize the combined static files + serverless entry, adapt the route configuration after inspecting the deployment log; do not announce a working live link before verifying it.
+- Open Vercel > `verrift` > Storage/Marketplace/Integrations > Add Supabase.
+- Connect a Supabase project to the Vercel project.
+- In Supabase SQL Editor run `supabase/schema.sql` once.
+- Supabase Authentication > Providers > Web3 (Ethereum): Enable.
+- Supabase Authentication > URL configuration: set Site URL to your Vercel domain; add `https://YOUR-URL/**` redirect allowlist. For local development, also allow `http://localhost:3000/**`.
 
-## 7. Final hackathon submission
+Make sure Vercel Environment Variables includes the following database variables. These will generally be created by the integration:
 
-Submit before **Monday, November 9, 2026 at 22:00 UTC (23:00 Nigeria time)**, as shown in the provided Vibeathon 02 rules. The entrant needs a genuinely working MVP and a live URL. Emphasize the end-to-end proof workflow and provide a direct live report link only after you create a real report and verify its URL.
+| Env name | Value | Required |
+| --- | --- | --- |
+| `SUPABASE_URL` | Supabase project URL | Yes (or `NEXT_PUBLIC_SUPABASE_URL`) |
+| `SUPABASE_PUBLISHABLE_KEY` | `sb_publishable_...` API key | Yes (or `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`) |
+| `SUPABASE_SECRET_KEY` | Server-only `sb_secret_...` key | Yes (legacy: `SUPABASE_SERVICE_ROLE_KEY`) |
 
-Keep the demo truthful: the controlled example is a deterministic HTTP/API-contract demonstration; Base anchoring and rewards must be real testnet transactions to claim onchain execution. If a connector is unavailable, explain that it is configured but not yet proven instead of editing screenshots or inventing test data.
+These three are consumed on the **server**, even if the URL and publishable key have `NEXT_PUBLIC` prefixes supplied by the integration. The secret must NEVER be public.
 
-## 8. Source update / ZIP overwrite
+## 4. Add the remaining Vercel variables manually
 
-To replace source in a preexisting desktop VERRIFT folder **without touching `.git`**, first inspect the ZIP and back up any locally modified source you want to retain. Then use the user's preferred overwrite pattern:
+| Env name | Value |
+| --- | --- |
+| `SESSION_SECRET` | Long randomly generated secret from `npm run setup`, at least 32 characters |
+| `ANTHROPIC_API_KEY` | Your private Anthropic API key, required to use Claude analysis |
+| `CLAUDE_MODEL` | `claude-sonnet-4-6` |
+| `BASE_SEPOLIA_RPC` | `https://sepolia.base.org` |
+| `PUBLIC_ORIGIN` | Your exact Vercel origin, e.g. `https://verrift.vercel.app` if assigned |
+| `ADMIN_WALLET_ADDRESS` | Optional: **your own wallet address** for `/admin`, not a password |
 
-```bash
-cd "/c/Users/MY PC/Desktop/verrift"
-unzip -oq "/c/Users/MY PC/Desktop/verrift-github-ready.zip" -d . && rm -f "/c/Users/MY PC/Desktop/verrift-github-ready.zip"
-npm ci
-npm run verify
-git add -A
-git commit -m "Ship VERRIFT proof-of-fix MVP"
-git push origin HEAD
-```
+You do **not** need `ADMIN_PASSWORD`, `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`, `DATABASE_URL`, wallet private keys or browser-exposed Anthropic keys.
 
-The downloaded archive contains source only: `.env` and `.git` are never included.
+## 5. Vercel project configuration
+
+- Framework preset: **Other**
+- Root Directory: `./`
+- Build: `npm run build`
+- Output Directory: `public`
+- Node: `22.x`
+- `vercel.json` routes `/api/*` to the serverless adapter, plus `/docs`, `/sandbox`, `/admin`, and `/report/*`.
+
+Save, deploy, then open the actual Vercel URL. If you need to set `PUBLIC_ORIGIN` after deployment assigns the URL, set the variable and redeploy.
+
+## 6. Validate the REAL deployed product
+
+1. Open VERRIFT in a private browser: no admin password appears.
+2. As Guest A, create a sandbox case, introduce a fault, run a failed check, restore, then verify.
+3. As Guest B, verify Guest A's cases and sandbox state are not visible.
+4. Connect a wallet, approve a SIWE message (not a transaction), sign in. Verify a personal workspace appears.
+5. Open the app with a different wallet. Confirm it does not show the first account's projects/cases.
+6. Register a public domain you own, publish DNS TXT or HTTPS file proof, then verify ownership.
+7. Configure Anthropic and record a **live** Claude analysis on a case with observations.
+8. From your signed-in Base Sepolia wallet, anchor proof in a real transaction; verify its explorer receipt.
+9. Configure and verify a non-custodial test ETH payout after a failed-to-passed repair.
+10. If your wallet is configured as `ADMIN_WALLET_ADDRESS`, open `/admin` for operator counts. Other users receive 403 for its private API.
+
+## Limitations
+
+Supabase is a live provider and this development container has no project credentials. Supabase Auth, real onchain transactions, and Vercel deployment MUST be verified by you after connection. Existing records from the single shared admin workspace are not migrated automatically. This MVP uses a single locked JSONB state document and an atomic CAS RPC; high-traffic scale needs relational tables and durable rate limiting.

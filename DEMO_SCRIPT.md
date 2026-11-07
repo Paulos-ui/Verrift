@@ -1,25 +1,15 @@
-# VERRIFT | Judge demo (75-95 seconds)
+# VERRIFT | 75-second hackathon demo
 
-**Before recording:** Configure Anthropic, connect a real Base Sepolia wallet, and have an actual proof/payout receipt available. If not yet completed, omit those live claims. Prepare a sandbox case with no fake evidence.
+0-10s: "Anyone can explore VERRIFT. No admin password, no barriers. This is the public proof-of-fix lab."
 
-**00:00 | Hook**
-"AI made shipping software faster. But here's the part no one celebrates: proving that a broken product was actually fixed. This is VERRIFT | the proof-of-fix network."
+10-25s: "I'll open a sandbox case and deliberately degrade our sample service. The real endpoint now returns HTTP 503, and VERRIFT records the failure."
 
-**00:12 | Real failure**
-"I'll deliberately break our sample service. This is its real API state, not a mocked score. I rerun the exact HTTP and content assertion: the result fails, and VERRIFT records the observation."
+25-38s: "I'll restore the service and run the exact same acceptance criteria. We now have a logged before-and-after result, not just a claimed fix."
 
-**00:29 | Real repair**
-"Now I restore the service. Same case, same acceptance criteria. This time the response passes, and the case becomes verified because we have both a recorded failure and a successful rerun."
+38-53s: "Now I connect my own Base wallet and sign in. Everyone gets a private workspace. Verified domains can be monitored only after ownership proof, and Anthropic's Claude can explain evidence without rewriting the verdict."
 
-**00:46 | AI**
-"Claude interprets the observed evidence and suggests remediation steps. But the model cannot declare victory | only a real rerun can do that." [Show only if your configured Anthropic call actually succeeds.]
+53-65s: "For verified repairs, I can record a SHA-256 proof fingerprint and a direct testnet reward on Base Sepolia. Each action needs an actual confirmed transaction."
 
-**01:00 | Base**
-"Now I can anchor the exact evidence fingerprint on Base Sepolia and inspect its transaction onchain. A developer reward can also be sent as test ETH, with the recipient and amount independently verified by VERRIFT." [Show only actual confirmed testnet hashes.]
+65-75s: "VERRIFT is for the next generation of builders: broken is a claim, fixed is a proof. Created by Jayking for Vibeathon 02."
 
-**01:18 | End**
-"VERRIFT is about the part that comes after 'ship it': capture the failure, prove the fix, and make the result accountable. Broken is a claim. Fixed is a proof."
-
-## What to show in a three-minute walkthrough
-
-Show the public report URL, export evidence JSON, authentication, one verified external-domain proof if configured, before/after checks, Base explorer receipt, and a real (or clearly unavailable) Claude analysis. Give the judges the chance to rerun the sample themselves.
+**Use this segment only after the Supabase login, Anthropic response and Base Sepolia transactions have been confirmed on the deployed site.** Don't show mocked transactions as live.

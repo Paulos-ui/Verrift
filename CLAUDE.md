@@ -4,12 +4,12 @@ This project was created under Jayking Build Lab v2. Treat the original global c
 
 **Project thesis:** A fix is not verified until an identical test that previously failed now passes. The test criteria must remain unchanged; all observations must be real. The Base onchain proof is a hash of real evidence and does not guarantee code quality.
 
-**Current implementation:** Node.js 22 (dependency-free ESM) / HTML CSS JS / Anthropic Messages API / Base Sepolia EIP-1193 and JSON-RPC, local JSON or Upstash. Build Lab's default Next.js + strict TypeScript preference is not met by this version; if upgrading, preserve tested behavior and do not pretend a syntax check is typechecking.
+**Current implementation:** Node.js 22 (dependency-free ESM) / HTML CSS JS / Anthropic Messages API / Base Sepolia EIP-1193 and JSON-RPC, local JSON or Supabase Postgres. Build Lab's default Next.js + strict TypeScript preference is not met by this version; if upgrading, preserve tested behavior and do not pretend a syntax check is typechecking.
 
 ## Non-negotiable rules
 
 - No fake security checks, fake AI output, fake transaction hashes, fake wallet success or placeholders disguised as working flows.
-- Never expose admin, Anthropic, Upstash, wallet or session secrets. `.env` is ignored. Never ask for a seed phrase.
+- Never expose Supabase secret, Anthropic, wallet or session secrets. `.env` is ignored. Never ask for a seed phrase.
 - Only run approved, owner-verified read-only public HTTPS checks. Keep DNS pinning, private-network guards, bounded resources and no-redirect policy intact.
 - Claude is advisory only. Never let generated prose or prompts change pass/fail results or execute shell commands.
 - Base Sepolia only, test ETH only, no custody/escrow claim, explicit wallet confirmation and independent receipt verification.
@@ -34,3 +34,7 @@ This project was created under Jayking Build Lab v2. Treat the original global c
 - `public/` | wallet controller and evidence UI
 - `tests/` | HTTP integration and security tests
 - `HACKATHON_BRIEF.md`, `DECISIONS.md`, `RELEASE_CHECKLIST.md` | submission guidance
+
+## Public app identity (v1.1)
+
+No shared admin password. Public guests can test an isolated sandbox. Signed Base wallet users authenticate through Supabase Web3 EIP-4361 and own private workspaces. `/admin` is a separate wallet-restricted operator dashboard. Supabase supplies production database persistence. See `supabase/schema.sql` and `DEPLOYMENT.md`.

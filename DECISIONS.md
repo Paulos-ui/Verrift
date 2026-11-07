@@ -7,5 +7,9 @@
 - **Safety:** Admin authorization + proof of external domain ownership; pinned, bounded GET-only HTTPS checks; read-only sample API sandbox. No arbitrary crawling, shell commands, exploit execution or unsandboxed browser navigation.
 - **AI:** Anthropic Messages API server-side, configurable model, short bounded input/output, errors surfaced. AI is explanatory only and cannot decide test status.
 - **Web3:** Base Sepolia 84532 only. Evidence anchor uses SHA-256 digest in a zero-value self-transaction; payout uses direct test ETH transfer verified from chain. No mainnet, no escrow or deployed custom contract, no pretend hashes.
-- **Persistence:** atomic JSON writes for local single-process use, optional optimistic CAS Upstash Redis for serverless. Cloud path requires live validation.
-- **Claim discipline:** Unit/integration tests for domain behavior, sandbox, mocked provider adapters, and auth; not claiming live Anthropic, wallet transfer, Redis or Vercel has passed until independently tested.
+- **Persistence:** atomic JSON writes for local single-process use, Supabase Postgres JSONB atomic compare-and-swap for production. Existing Upstash adapter remains for migration support only. Cloud path requires live validation.
+- **Claim discipline:** Unit/integration tests for domain behavior, sandbox, mocked provider adapters, and auth; not claiming live Anthropic, wallet transfer, Supabase or Vercel has passed until independently tested.
+
+## Public multi-user revision
+
+Replaced the former single-password gate with Supabase Web3 wallet identity, guest sandbox access, record owner IDs and a separate admin-wallet-only operator view. Default production persistence is Supabase Postgres with atomic JSONB CAS. Guest demo and signed-in accounts are isolated. No live external credentials are bundled.

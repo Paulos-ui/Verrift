@@ -35,3 +35,14 @@ export async function anchorEvidence({from,digest}){
  if(!/^0x[a-f\d]{64}$/i.test(digest))throw new Error('Invalid evidence digest');
  return await provider.request({method:'eth_sendTransaction',params:[{from,to:from,value:'0x0',data:'0x56455252494654'+digest.slice(2).toLowerCase()}]});
 }
+
+export async function signInMessage(message){
+ if(!provider)throw new Error('Connect your wallet first');
+ const accounts=await provider.request({method:'eth_accounts'});
+ if(!accounts?.[0])throw new Error('Wallet is disconnected');
+ const hex='0x'+Array.from(new TextEncoder().encode(message),b=>b.toString(16).padStart(2,'0')).join('');
+ return await provider.request({method:'personal_sign',params:[hex,accounts[0]]});
+}
+export function watchWalletChanges(fn){
+ if(window.ethereum?.on){window.ethereum.on('accountsChanged',fn);window.ethereum.on('chainChanged',fn);}
+}

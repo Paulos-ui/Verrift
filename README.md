@@ -1,25 +1,28 @@
-# VERRIFT
+# VERRIFT | The Proof-of-Fix Network
 
-**Broken is a claim. Fixed is a proof.**
+**A public Base Sepolia repair-verification platform with private wallet workspaces and an open guest lab.**
 
-VERRIFT is an evidence-first repair workspace built for Vibeathon 02: Night Shift. Record a reproducible failure, rerun the same acceptance criteria after a fix, optionally ask Claude to interpret the observations, anchor a SHA-256 proof fingerprint on **Base Sepolia**, and verify a direct testnet developer reward.
+Built by Jayking (`paulos-ui`, [@__official__1](https://x.com/__official__1)) for Vibeathon 02. AI coding assistance was used. Claude (Anthropic) is an optional server-side evidence analyst, not the source of test verdicts.
 
-> **Status:** functional local MVP, not an audited production platform. There is no public deployment URL or live wallet/API credential included. The 20 automated tests were executed locally with controlled external-service responses. Vercel and live Base/Anthropic functionality require setup and independent verification.
+## Experience
 
-## What works
+- **Anyone can open VERRIFT** without a password, create a guest sandbox case, break a sample service and prove the repair by rerunning the same check. Guest cases and state are isolated by signed visitor cookies; guests have 2 cases and 20 runs per case. Guest demo records expire from storage after 24 hours when cleanup runs.
+- **Wallet owners** sign an EIP-4361 message to Supabase Auth, which verifies the Ethereum signature and issues an identity. VERRIFT then issues a short-lived secure, HTTP-only session cookie. User workspaces have distinct case records, proof histories and domain registrations. A guest's cases are moved into that wallet account at first sign-in.
+- **Domain owners** verify possession through DNS TXT or HTTPS file challenges before running narrowly scoped, read-only public HTTPS checks.
+- **Claude** reads bounded observations (no private wallet keys) and offers hypotheses, never authoritative pass/fail status.
+- **Base Sepolia** verifies self-addressed SHA-256 proof anchor transactions and non-custodial test ETH reward transfers using transaction receipts. No escrow or mainnet transfers are included.
+- **Share links** are opt-in bearer URLs for public, read-only evidence reports. Without the URL token, private cases are not disclosed.
+- **The operator view** at `/admin` only shows aggregate counts, restricted to the one authenticated wallet configured as `ADMIN_WALLET_ADDRESS`. The public user interface needs no administrator password.
 
-- Private workspace sign-in (12-hour signed HttpOnly, SameSite=Strict session cookies).
-- Actual persisted case records, locked test criteria and test history.
-- Controlled live sandbox with service states `HTTP 503 / SERVICE_UNAVAILABLE` and `HTTP 200 / SERVICE_READY` and an unchanged rerun after repair.
-- Registered public domains with DNS TXT or HTTPS well-known-file ownership proof. Requests use pinned DNS and bounded, read-only HTTPS GET checks. No arbitrary scanning, redirects, custom ports or local/private targets.
-- Evidence compare view, timestamped results and pass/fail assertions. `verified` means the recorded check failed and later passed under the same criteria; it does not certify a whole application's safety.
-- Optional **Anthropic Claude API** analysis of real, bounded observation data. No autonomous patching or invented fixes.
-- Base Sepolia injected EVM wallet connection, network switching and explicit transaction signing.
-- **Proof anchor:** hash a failed/passing evidence pair with SHA-256, send a zero-value wallet self-transaction containing the digest, then verify the actual Base Sepolia receipt and calldata.
-- **Direct repair reward:** configure a recipient wallet and test ETH amount, send from the connected wallet after verified repair, then verify receipt status, amount, sender and recipient from Base RPC. No escrow and no mainnet custody.
-- Read-only shareable reports, JSON export, responsive dashboard, About/Docs, and local + optional Upstash REST persistence.
+## Requirements
 
-## Quick start (Node.js 22+)
+- Node.js 22+
+- A Supabase project with **Auth -> Web3 -> Ethereum enabled** and your deployment domain configured in the Auth redirect allowlist
+- Supabase Postgres schema from [`supabase/schema.sql`](supabase/schema.sql)
+- A compatible EVM wallet, connected to Base Sepolia (chain 84532) for signed-in functions
+- Optional Anthropic API key for AI evidence analysis
+
+## Local setup
 
 ```bash
 npm ci
@@ -27,94 +30,48 @@ npm run setup
 npm run dev
 ```
 
-The setup command creates an ignored `.env` and **prints a fresh admin password once**. Store the password securely and open `http://localhost:3000` in a browser. You can use this application without Anthropic or a wallet to try the full sandbox testing sequence.
+Visit http://localhost:3000. Guest lab works with local file persistence without Supabase. For full wallet sign-in, create a Supabase project and add `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY` to `.env`. Run `supabase/schema.sql` in Supabase SQL Editor and allowlist `http://localhost:3000/**` in Supabase Auth redirect URLs.
 
-### Demo workflow
+`npm run setup` generates a private `SESSION_SECRET`. It does **not** generate an administrator password because visitors do not use a shared admin login.
 
-1. Sign in with the generated admin password.
-2. On Overview, select **Run the live sandbox** to open its real case record.
-3. Select **Introduce fault**, then return to the case and **Run the exact check**. The assertion fails because the sample service actually reports 503.
-4. Return to Overview, select **Restore service**, then rerun the unchanged case. The status becomes **Verified**.
-5. With an Anthropic key, select **Analyze current evidence** to request an actual Claude explanation.
-6. With a wallet that has **Base Sepolia test ETH**, connect, choose **Anchor evidence on Base** and sign the zero-value self-transaction. After it mines, confirm the receipt.
-7. Specify a recipient wallet and reward amount, send test ETH from your wallet and confirm its real onchain receipt.
-8. Export the evidence JSON or share the read-only public case link.
+## Production setup: Supabase + Vercel
 
-## Required and optional environment variables
+1. Push the complete repository to `https://github.com/paulos-ui/verrift`.
+2. Import that repo in Vercel, Framework **Other**, root `./`, build `npm run build`, output directory `public`, Node 22.x.
+3. Install the **Supabase** integration in your Vercel project, and ensure `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, and `SUPABASE_SECRET_KEY` are provisioned. Depending on the integration, `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` may be supplied instead. This backend recognizes those aliases. The secret stays server-only.
+4. Open your Supabase dashboard -> SQL Editor. Run the full [`supabase/schema.sql`](supabase/schema.sql) once.
+5. Supabase -> Authentication -> Providers -> enable **Web3 wallet / Ethereum**. In Authentication URL configuration, add `https://YOUR-VERCEL-DOMAIN/**` and set your canonical Site URL.
+6. Add to Vercel manually: `SESSION_SECRET`, `ANTHROPIC_API_KEY` (optional but required for live Claude), `CLAUDE_MODEL=claude-sonnet-4-6`, `BASE_SEPOLIA_RPC=https://sepolia.base.org`, `PUBLIC_ORIGIN=https://YOUR-VERCEL-DOMAIN` and `ADMIN_WALLET_ADDRESS` (optional, your single operator wallet).
+7. Redeploy after adding values. Check `/api/status` returns `persistence: "supabase"`. Test guest failure -> repair, then wallet sign-in, separate accounts, domain verification, Claude and real Base Sepolia transactions.
 
-Copy `.env.example` to `.env`, or let `npm run setup` generate local secrets.
+**You do not need Redis/Upstash once Supabase is installed.** Do not add `ADMIN_PASSWORD` or `DATABASE_URL` for this app. `SESSION_SECRET` is *not* a login password. It signs secure sessions. Never put Supabase secret keys, Anthropic keys, or wallet private keys in GitHub or browser code.
 
-| Name | Required | Description |
-|---|---|---|
-| `ADMIN_PASSWORD` | Yes | Long unique administrator password; at least 12 characters |
-| `SESSION_SECRET` | Yes | Random session-signing secret; at least 32 characters |
-| `ANTHROPIC_API_KEY` | For Claude | Anthropic API key, server-side only |
-| `CLAUDE_MODEL` | No | Defaults to `claude-sonnet-4-6`; use a model available to your API account |
-| `BASE_SEPOLIA_RPC` | For proof/transfer verification | Base Sepolia JSON-RPC URL; default `https://sepolia.base.org` |
-| `UPSTASH_REDIS_REST_URL` | Production | Managed Redis REST endpoint. Use both Upstash settings together |
-| `UPSTASH_REDIS_REST_TOKEN` | Production | Private Redis REST token |
-| `PUBLIC_ORIGIN` | Production | Exact deployed HTTPS origin, e.g. `https://verrift.example` |
-| `PORT` | No | Local port (default `3000`) |
+## API and trust boundaries
 
-**Never put secrets in `NEXT_PUBLIC_*` variables, browser code, Git or the submission ZIP.** The `.env.example` includes no live credentials.
+- `GET /api/status`, `GET /api/data` are public; `/api/data` is scoped to the visitor or signed-in user.
+- `GET /api/auth/challenge?address=...`, `POST /api/auth/verify` perform challenge-response authentication via Supabase Web3.
+- `POST /api/cases`, `POST /api/cases/:id/run`, `POST /api/sandbox` allow guest sandbox operations, and verify per-actor access.
+- `POST /api/projects`, `/api/projects/:id/verify`, `/api/cases/:id/analyze`, `/api/cases/:id/anchor`, `/api/cases/:id/reward`, and `/api/cases/:id/confirm-payment` require a signed-in wallet.
+- `GET /api/admin/summary` requires the authenticated operator wallet.
+- `GET /api/public/:id?token=...` requires an explicit bearer token created by the owner.
 
-## Architecture
+The data store uses a server-only JSONB record in Supabase with an atomic Postgres compare-and-swap routine. This is sufficient for a constrained public MVP but is not a horizontally partitioned multi-tenant database. For a high-traffic production launch, migrate each entity to separate tables, implement per-table RLS, add durable edge-rate-limits and monitoring, conduct full security reviews, and audit any custody or escrow functionality before using real assets.
 
-```text
-public/                 Responsive editorial UI, wallet controller, docs, report and sample service
-server.js               Local Node.js HTTP server
-api/index.js            Vercel serverless entry, including rewritten route normalization
-lib/app.js              Session auth, validation, routes, case/run lifecycle, export and rewards
-lib/domain.js           Public domain validation, proof and pinned HTTPS assessment
-lib/ai.js               Bounded server-side Anthropic Messages API adapter
-lib/base.js             Base Sepolia JSON-RPC receipt verification and proof calldata
-lib/store.js            Atomic local JSON persistence or Upstash Redis compare-and-set
-lib/utils.js            Shared validation, hashing and identifier helpers
-tests/                  Node built-in test runner, API integration and mocked remote providers
-```
-
-Runtime dependencies: **zero third-party packages**. This was intentional to enable offline installation and a locally executable, tested MVP. It does **not** use Next.js, React, wagmi or a TypeScript build; the current implementation is plain modern JavaScript with a Node HTTP backend. Do not describe its syntax check as a TypeScript check.
-
-### Real external-site scope
-
-An external case checks **one owner-verified public HTTPS URL** with a GET request, expected status and optional response text. The checker verifies the hostname resolves to public addresses and pins the HTTPS request to a validated address; it does not follow redirects. Body reading is limited to 120 KB, timeout to 8s, and TLS verification remains enabled. This is not general browser automation or a security pentest.
-
-The sandbox evaluates **actual persisted API service state** for a deterministic contract test. It is a useful, real before/after demonstration but is not a screenshot-driven website test and should be described accordingly.
-
-## Deployment
-
-See [GITHUB_PUSH.md](GITHUB_PUSH.md) for the exact `paulos-ui/verrift` push commands and [DEPLOYMENT.md](DEPLOYMENT.md) for Vercel + Upstash setup and live smoke checks. **Do not deploy without production secrets and durable storage.** Mainnet deployment, custody and paid escrow are intentionally out of scope.
-
-## Quality checks
+## Testing
 
 ```bash
-npm ci --offline
-npm run lint        # JS syntax and JSON validation, not ESLint
-npm test            # Node built-in tests
-npm run build       # JS syntax and JSON validation, not a bundled compilation
-npm run verify      # syntax + tests + syntax
+npm run verify
 ```
 
-The automated suite covers session authorization, cross-origin blocking, domain validation, ownership gating, deterministic failures and repairs, sharing, reward eligibility and uniqueness, Base receipt validation, proof fingerprint integrity and Claude request construction.
+Node tests cover domain safety, authenticated and guest sandbox evidence, wallet separation, replay-limited challenges, Base RPC evidence and payouts, and the serverless route adapter. External provider integrations are mocked in tests, so **a passing suite does not mean live Supabase, Anthropic, or Base transactions have succeeded**.
 
-Browser layout was rendered at 390, 768 and 1440 px widths using the real HTML/CSS/JS with stubbed API responses. No overflow or page errors were found in those layout-only checks; **real localhost browser navigation was blocked by the container's browser administrator policy**, so a full live interaction flow in Chromium remains unverified.
+## Deployment and demo
 
-## Known limitations / safety
+- [`DEPLOYMENT.md`](DEPLOYMENT.md) contains an environment checklist and verification plan.
+- [`GITHUB_PUSH.md`](GITHUB_PUSH.md) contains exact WSL unzip, commit and GitHub push commands.
+- [`DEMO_SCRIPT.md`](DEMO_SCRIPT.md) contains a short walkthrough.
+- [`SECURITY.md`](SECURITY.md) documents safety boundaries.
 
-- **No escrow:** direct EOA-to-EOA test ETH only. Don't use real funds or mainnet addresses in the MVP.
-- Onchain transfers are irreversible and incur network gas, even if testnet tokens have no market value.
-- Claude can be wrong; its analysis is advisory and separated from deterministic pass/fail evidence.
-- The application uses a single administrator password, not multi-user authentication or SIWE.
-- Vercel/Upstash, wallet signatures, real public domain verification and live Claude calls have not been exercised in this container.
-- One HTTP status/text assertion per case; no isolated Playwright worker, automatic PR patch, production monitoring or penetration testing.
-- The Upstash adapter uses an atomic compare-and-set loop but hasn't been tested against a live account.
-- Evidence records can be deleted by the workspace administrator before reward payment. Onchain anchors include a hash, not raw evidence or a proof that a repair is correct.
-- This is a hackathon MVP requiring a real deployment and external integration checks before public submission.
+## License
 
-## Credits, disclosures and licenses
-
-Created by **Jayking** (GitHub: [paulos-ui](https://github.com/paulos-ui), X: [@__official__1](https://x.com/__official__1)). Developed with AI coding assistance. Optional runtime model analysis uses the Anthropic API when the owner configures a key. The application is independently authored source code, with no copied stock imagery. Licensed under MIT (see LICENSE).
-
-Base docs: https://docs.base.org/base-chain/api-reference/ethereum-json-rpc-api/eth_chainId  
-Anthropic docs: https://docs.anthropic.com/en/api/messages  
-Vibeathon rules: https://blog.vibestarter.xyz/vibeathon-02
+MIT. See [`LICENSE`](LICENSE). Keep required contest disclosures accurate.
