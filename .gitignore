@@ -1,0 +1,12 @@
+.env
+.env.*
+!.env.example
+node_modules/
+.next/
+.vercel/
+coverage/
+data/*
+!data/.gitkeep
+*.log
+.DS_Store
+.tmp/

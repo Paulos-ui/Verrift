@@ -1,0 +1,21 @@
+name: VERRIFT verification
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Offline-compatible install
+        run: npm ci
+      - name: Syntax and integration verification
+        run: npm run verify
