@@ -85,3 +85,10 @@ Node tests cover domain safety, authenticated and guest sandbox evidence, wallet
 ## License
 
 MIT. See [`LICENSE`](LICENSE). Keep required contest disclosures accurate.
+
+
+## White Room interface refinement (V5)
+
+The public homepage (`/`) now uses a pure-white editorial canvas while retaining its original scroll animation, protocol demonstration, Base proof explanation and enter-app CTA. The user workspace (`/app`) adds a cleaner white navigation rail, a richer but real-data-only overview, clear live sandbox controls, four evidence journey stages and separate contextual activity panels. The dark green repair hero and rust accents remain part of the brand.
+
+No Supabase schema change or new environment variable is needed for this design update. If `/app` still displays an API configuration warning, finish the database and environment setup described in `VERCEL_DATABASE_NEXT.md`.

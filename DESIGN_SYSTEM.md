@@ -2,12 +2,12 @@
 
 ## Design territories considered
 
-1. **Evidence Room (selected)**: warm laboratory paper (`#eae9e2`), near-black green ink (`#252d2a`), oxidized clay (`#c66d4e`), restrained plant green (`#3f7356`). Oversized editorial Georgia headings, concise Helvetica body, precise console labels. This suits a product that records evidence and encourages close inspection.
+1. **White Evidence Room (selected, V5)**: pure white canvas (`#ffffff`), charcoal-green ink (`#202c27`), rust accents (`#bf6548`), and forest green (`#28654a`). Pale green surfaces are reserved for contextual cards. Oversized editorial Georgia headings, concise Helvetica body, precise console labels. This suits a product that records evidence and encourages close inspection.
 2. **Night Shift Console (alternative)**: slate black (`#1b2528`), copper gold (`#bf9361`), cool grey (`#b0bec3`), and bone (`#f0eadd`). High-contrast condensed headings and small monospace details. More technically atmospheric, but less legible and welcoming for first-time visitors.
 
 ## Visual idea
 
-The homepage is a **living repair case file**, not a generic SaaS dashboard. A large engraved V plus an interrupted, then rising line introduces an evidence trail. The paper-and-ink palette reverses at the product principles section; the closing invitation arrives as a distinct clay-color poster.
+The homepage is a **living repair case file**, not a generic SaaS dashboard. A large engraved V plus an interrupted, then rising line introduces an evidence trail. The clean white and deep-green palette reverses at the product principles section; the closing invitation arrives as a distinct clay-color poster.
 
 ## Page architecture
 
@@ -33,9 +33,17 @@ The actual user workspace is preserved at `/app`, not embedded in the public hom
 
 Micro-interactions remain interruptible. No scrolling is hijacked. The storyboard panel is **clearly identified as an illustration** and must not be presented as a live test result; live tests are inside `/app`.
 
+## Workspace redesign V5
+
+The `/app` workspace adopts a precise, airy information hierarchy inspired by modern productivity tools without copying any existing service. A white sidebar organizes Overview, Cases, Domains and Docs. The lead panel remains VERRIFT forest green and the functional call to action is prominent.
+
+The overview is made of **real state-backed components**: case count, executed checks, verified repairs, Base Sepolia receipts, recent repair cases, test environment controls, latest actual observations and a four-stage proof guide. All progress indicators are derived from returned API records. The two panel illustrations are labeled as illustrative, and do not pretend to show real checks.
+
+No additional frontend dependencies are required. The white theme is implemented through `public/styles.css`, `public/landing.css` and the workspace-only override `public/ui-v5.css`.
+
 ## Responsive / accessibility
 
-- Layout tested statically at 390, 768 and 1440 CSS px. No document horizontal overflow or JS exceptions in the available static Chromium harness.
+- Landing and workspace layouts tested with static Chromium previews at 390, 768 and 1440 CSS px. No document horizontal overflow or JS exceptions in the available static Chromium harness.
 - Sticky navigation, reduced-motion CSS, keyboard-visible focus, skip link, contrast-safe primary CTAs, semantic sections and `aria-pressed` buttons.
 - Browser navigation to localhost was blocked by the evaluation environment, so a full production interaction audit remains outstanding.
 

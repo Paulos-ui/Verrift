@@ -25,3 +25,13 @@ See `DEPLOYMENT.md` for acceptance checklist.
 - Static Chromium rendering with injected HTML/CSS/JS at 1440x900, 768x1000 and 390x844: no document horizontal overflow or JavaScript exceptions; the repair-phase buttons updated state.
 - Browser navigation to localhost was blocked by administrator policy. This prevented full live-nav, network and mobile-interaction audits.
 - Vercel database still requires Supabase resource linkage, environment variables, SQL schema and redeploy. No actual production database, Anthropic API or Base transactions tested here.
+
+
+## V5 UI refinement verification (November 2026)
+
+- `npm run verify` executed successfully with **37/37 passing tests**. Four new tests cover white branding, data-derived overview content, stable navigation/title, and no em dashes in public source.
+- Static Chromium previews of the actual workspace template with an empty guest-state fixture at 390, 768 and 1440 CSS pixels: no horizontal overflow, no page JavaScript exceptions, correct operator/logout visibility.
+- Static Chromium landing-page previews at the same widths: computed pure-white body background, no horizontal overflow or page JavaScript exceptions.
+- `npm run build` is syntax and JSON validation only, not a TypeScript compiler.
+- Full browser navigation to localhost remained blocked by the test environment; external Supabase Auth, Base Sepolia settlement and real Anthropic responses were not live-tested for this UI release.
+- No production Vercel deployment or GitHub push was executed from this workspace.

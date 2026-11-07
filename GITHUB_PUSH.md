@@ -2,10 +2,10 @@
 
 ## Extract without mkdir (WSL)
 
-Download `verrift-landing-v4.zip` to your Windows Desktop. This command creates the `verrift` directory automatically when needed and preserves its `.git` folder when one exists:
+Download `verrift-white-room-v5.zip` to your Windows Desktop. This command creates the `verrift` directory automatically when needed and preserves its `.git` folder when one exists:
 
 ```bash
-cd "/mnt/c/Users/MY PC/Desktop" && unzip -oq "verrift-landing-v4.zip" -d "verrift" && cd "verrift"
+cd "/mnt/c/Users/MY PC/Desktop" && unzip -oq "verrift-white-room-v5.zip" -d "verrift" && cd "verrift"
 ```
 
 Check the code:
@@ -21,7 +21,7 @@ If you already pushed the repo to GitHub, **do not run `git init` again**:
 
 ```bash
 git add -A
-git commit -m "Add interactive VERRIFT landing page and app route"
+git commit -m "Refine VERRIFT white workspace and evidence dashboard"
 git push origin HEAD
 ```
 
@@ -41,4 +41,4 @@ Always confirm the `.env` file remains excluded. For Vercel deployment, see `DEP
 
 ### What changed in this ZIP
 
-The real application dashboard is now at `/app`, and a separate public interactive landing page is at `/`. The old `server.js` must still be removed after unzipping if present locally. For the existing database startup error, see `VERCEL_DATABASE_NEXT.md`.
+The existing public interactive landing page stays at `/`, now on a white canvas. The `/app` dashboard gains a white navigation rail, verified metrics, guided proof flow, accessible mobile labels and informative real-data panels. The old `server.js` must still be removed after unzipping if present locally. For the existing database startup error, see `VERCEL_DATABASE_NEXT.md`.
