@@ -13,3 +13,10 @@
 ## Public multi-user revision
 
 Replaced the former single-password gate with Supabase Web3 wallet identity, guest sandbox access, record owner IDs and a separate admin-wallet-only operator view. Default production persistence is Supabase Postgres with atomic JSONB CAS. Guest demo and signed-in accounts are isolated. No live external credentials are bundled.
+
+## Public landing (November 7, 2026)
+
+- Introduced a separate premium public experience at `/`, preserving the existing working dashboard at `/app`.
+- Chose Evidence Room editorial motion direction, using original SVG artwork and no external animation dependencies.
+- The homepage repair sequence is explicitly marked an illustration and links to the actual sandbox flow.
+- Supabase remains production persistence; no migration, credentials, or real live provider calls are included in the source update.

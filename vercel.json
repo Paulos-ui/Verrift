@@ -18,6 +18,10 @@
       "destination": "/api/index.js?__route=__healthz"
     },
     {
+      "source": "/app",
+      "destination": "/workspace.html"
+    },
+    {
       "source": "/docs",
       "destination": "/docs.html"
     },

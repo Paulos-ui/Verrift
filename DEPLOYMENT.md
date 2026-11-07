@@ -45,6 +45,8 @@ Do not overwrite `.git`, force-push or share API secrets.
 
 ## 3. Add Supabase on Vercel
 
+**Read `VERCEL_DATABASE_NEXT.md` for the current API error and SQL Editor steps.**
+
 **Yes. Choose Supabase, not Redis, to power individual user accounts and their persisted cases.**
 
 - Open Vercel > `verrift` > Storage/Marketplace/Integrations > Add Supabase.
@@ -85,11 +87,11 @@ You do **not** need `ADMIN_PASSWORD`, `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_R
 - Node: `22.x`
 - The static site is served from `public/` and Vercel uses the `api/index.js` serverless function. `vercel.json` routes `/api/*`, `/docs`, `/sandbox`, `/admin`, and `/report/*`. Root `server.js` must **not** exist.
 
-Save, deploy, then open the actual Vercel URL. If you need to set `PUBLIC_ORIGIN` after deployment assigns the URL, set the variable and redeploy.
+Save, deploy, then open the actual Vercel URL. The static landing is at `/` and the user dashboard is at `/app`. If you need to set `PUBLIC_ORIGIN` after deployment assigns the URL, set the variable and redeploy.
 
 ## 6. Validate the REAL deployed product
 
-1. Open VERRIFT in a private browser: no admin password appears.
+1. Open `/` in a private browser: public animated landing loads without an admin password; CTA goes to `/app`.
 2. As Guest A, create a sandbox case, introduce a fault, run a failed check, restore, then verify.
 3. As Guest B, verify Guest A's cases and sandbox state are not visible.
 4. Connect a wallet, approve a SIWE message (not a transaction), sign in. Verify a personal workspace appears.

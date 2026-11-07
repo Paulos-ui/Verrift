@@ -2,9 +2,16 @@
 
 **Vercel runtime hotfix:** This release separates the static website (`public/`) from the Vercel API (`api/index.js`). The local development server lives in `scripts/dev-server.js`. Before pushing over an older extraction, remove the obsolete root `server.js`. See `VERCEL_HOTFIX.md` for exact WSL instructions and environment settings.
 
-**A public Base Sepolia repair-verification platform with private wallet workspaces and an open guest lab.**
+**A public Base Sepolia repair-verification platform with an animated editorial landing page, private wallet workspaces and an open guest lab.**
 
 Built by Jayking (`paulos-ui`, [@__official__1](https://x.com/__official__1)) for Vibeathon 02. AI coding assistance was used. Claude (Anthropic) is an optional server-side evidence analyst, not the source of test verdicts.
+
+## Public landing and workspace
+
+- `/`: premium public introduction with scroll-revealed product narrative, case-file artwork, interactive three-stage **illustration** and a final CTA. It is static, loads without Supabase, and uses no fake data or artificial transaction IDs.
+- `/app`: the real evidence-room dashboard, cases, guest sandbox, wallet sign-in and transactional workflows. This is where the live backend is required.
+- `/docs`: full methodology and limitations. `/sandbox`: observable sample service. `/admin`: wallet-gated operator view.
+- `DESIGN_SYSTEM.md`: visual territories, motion storyboard, and accessibility/performance tradeoffs.
 
 ## Experience
 
@@ -32,7 +39,7 @@ npm run setup
 npm run dev
 ```
 
-Visit http://localhost:3000. Guest lab works with local file persistence without Supabase. For full wallet sign-in, create a Supabase project and add `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY` to `.env`. Run `supabase/schema.sql` in Supabase SQL Editor and allowlist `http://localhost:3000/**` in Supabase Auth redirect URLs.
+Visit http://localhost:3000 for the public landing and http://localhost:3000/app for the workspace. Guest lab works with local file persistence without Supabase. For full wallet sign-in, create a Supabase project and add `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY` to `.env`. Run `supabase/schema.sql` in Supabase SQL Editor and allowlist `http://localhost:3000/**` in Supabase Auth redirect URLs.
 
 `npm run setup` generates a private `SESSION_SECRET`. It does **not** generate an administrator password because visitors do not use a shared admin login.
 
@@ -73,6 +80,7 @@ Node tests cover domain safety, authenticated and guest sandbox evidence, wallet
 - [`GITHUB_PUSH.md`](GITHUB_PUSH.md) contains exact WSL unzip, commit and GitHub push commands.
 - [`DEMO_SCRIPT.md`](DEMO_SCRIPT.md) contains a short walkthrough.
 - [`SECURITY.md`](SECURITY.md) documents safety boundaries.
+- [`VERCEL_DATABASE_NEXT.md`](VERCEL_DATABASE_NEXT.md) explains the exact Supabase/Vercel repair steps for the runtime error shown in the user screenshots.
 
 ## License
 

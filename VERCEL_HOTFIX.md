@@ -77,3 +77,8 @@ If a `500 FUNCTION_INVOCATION_FAILED` persists **after** deployment, open Vercel
 - Serverless rewrite handler: status and health routes returned 200 in local adapter tests.
 - Deployment architecture and root-entrypoint absence: statically checked.
 - True production Vercel build / browser / Supabase credentials: **not executed** here; requires GitHub push and Vercel redeploy.
+
+
+## New public landing separation
+
+The public `/` page is now static and does not require a database. The real user workspace is at `/app` and needs correctly configured Supabase. For the visible runtime error in the supplied logs, see `VERCEL_DATABASE_NEXT.md`.

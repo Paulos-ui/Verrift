@@ -17,3 +17,11 @@ See `DEPLOYMENT.md` for acceptance checklist.
 - Added graceful initialization errors to api/index.js, new deployment architecture tests, and API rewrite adapter checks.
 - 30/30 tests passed locally; see VERCEL_HOTFIX.md.
 - Vercel cloud runtime was not exercised, and the exact error from Vercel Runtime Logs remains unknown.
+
+## Landing update QA, November 7, 2026
+
+- New public `/` is a standalone static landing. The existing workspace moves to `/app`.
+- Build and tests: 33/33 Node tests passed after route, motion, and static-response assertions were added.
+- Static Chromium rendering with injected HTML/CSS/JS at 1440x900, 768x1000 and 390x844: no document horizontal overflow or JavaScript exceptions; the repair-phase buttons updated state.
+- Browser navigation to localhost was blocked by administrator policy. This prevented full live-nav, network and mobile-interaction audits.
+- Vercel database still requires Supabase resource linkage, environment variables, SQL schema and redeploy. No actual production database, Anthropic API or Base transactions tested here.
