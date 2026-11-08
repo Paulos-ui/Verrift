@@ -1,5 +1,5 @@
 /* VERRIFT / White Room refinement
-   Clean white surfaces, ink and mineral green, with a restrained rust signal.
+   Clean white surfaces, ink and mineral green, with a restrained blue signal.
    All activity and completion states are derived from real API responses. */
 :root {
   --paper: #ffffff;
@@ -7,10 +7,10 @@
   --ink: #202c27;
   --sub: #63736b;
   --edge: #e2eae5;
-  --deep: #1e2b25;
-  --rust: #bf6548;
-  --rust-dark: #9b4832;
-  --green: #28654a;
+  --deep: #123f35;
+  --accent: #3177a5;
+  --accent-deep: #1b5b84;
+  --green: #206954;
 }
 body { background: #fff; }
 .shell { grid-template-columns: 244px minmax(0,1fr); }
@@ -30,7 +30,7 @@ body { background: #fff; }
 .nav-item.active {
   background: #eaf4ed;
   color: #204b34;
-  border-left: 3px solid var(--rust);
+  border-left: 3px solid var(--accent);
   padding-left: 12px;
   font-weight: 750;
 }
@@ -50,7 +50,7 @@ body { background: #fff; }
 .dashboard-intro { display:flex; align-items:flex-end; justify-content:space-between; gap:26px; padding:43px 0 29px; }
 .dashboard-intro .eyebrow { margin:0 0 13px; font:700 10px var(--mono); color:var(--green); letter-spacing:.1em; }
 .dashboard-intro h1 { font:400 clamp(30px,3.2vw,48px)/1.08 var(--serif); letter-spacing:-.06em; margin:0 0 11px; }
-.dashboard-intro h1 em { color:var(--rust-dark); }
+.dashboard-intro h1 em { color:var(--accent-deep); }
 .dashboard-subtitle { margin:0; font-size:12px; line-height:1.7; max-width:580px; color:var(--sub); }
 .intro-actions { display:flex; align-items:center; gap:11px; flex-wrap:wrap; justify-content:flex-end; flex-shrink:0; }
 .workspace-chip { display:inline-flex; align-items:center; gap:7px; font:700 9px var(--mono); color:#416d52; padding:12px; border:1px solid #dcebe1; border-radius:7px; background:#f5faf7; white-space:nowrap; }
@@ -65,9 +65,9 @@ body { background: #fff; }
 .feature-panel::before { content:""; position:absolute; width:300px; height:300px; background:#ffffff06; border:1px solid #ffffff19; border-radius:50%; top:-200px; right:-60px; pointer-events:none; }
 .feature-copy { position:relative; z-index:1; display:flex; flex-direction:column; align-items:flex-start; }
 .feature-index { font:700 9px var(--mono); letter-spacing:.09em; color:#badbc6; display:flex; gap:12px; }
-.feature-index span { color:#e59b73; }
+.feature-index span { color:#a6e9dc; }
 .feature-panel h2 { font:400 clamp(35px,3.3vw,53px)/.99 var(--serif); letter-spacing:-.065em; margin:24px 0 13px; }
-.feature-panel h2 em { color:#ecaa89; }
+.feature-panel h2 em { color:#b7ecdf; }
 .feature-panel p { font-size:11px; line-height:1.75; color:#d0dfd5; max-width:370px; margin:0 0 22px; }
 .feature-actions { display:flex; flex-wrap:wrap; align-items:center; gap:15px; margin-top:auto; }
 .feature-cta { border:0; border-radius:6px; color:#22382e; font:750 10px var(--sans); background:#fff; padding:13px 14px; display:inline-flex; align-items:center; gap:17px; text-align:left; }
@@ -81,15 +81,15 @@ body { background: #fff; }
 .diagram-fail,.diagram-pass { flex:1; min-width:0; border:1px solid #ffffff44; border-radius:7px; padding:13px 10px; background:#132e267d; }
 .diagram-fail span,.diagram-pass span { font:8px var(--mono); color:#c8dacd; }
 .diagram-fail strong,.diagram-pass strong { display:block; font:400 clamp(22px,2.2vw,35px) var(--serif); letter-spacing:-.04em; margin:8px 0 5px; }
-.diagram-fail strong { color:#eaa482; }
+.diagram-fail strong { color:#9dd9f2; }
 .diagram-pass strong { color:#c5e8ca; }
 .diagram-fail small,.diagram-pass small { display:block; font-size:9px; color:#d3e1d4; line-height:1.5; }
-.diagram-link { color:#e9ac8c; font-size:22px; }
+.diagram-link { color:#b7ecdf; font-size:22px; }
 .diagram-caption { font-size:7px; color:#9fbfab; }
 .metric-row { border:0; background:transparent; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; margin:15px 0 42px; }
 .metric { background:#fff; border:1px solid var(--edge)!important; padding:18px 15px; border-radius:11px; min-width:0; }
 .metric-label { white-space:normal; gap:5px; color:#65776b; font:700 9px/1.45 var(--sans); min-height:30px; }
-.metric-dot { color:var(--rust); font-size:17px; line-height:1; }
+.metric-dot { color:var(--accent); font-size:17px; line-height:1; }
 .metric-value { font:400 40px/1 var(--serif); margin:8px 0 7px; color:#202e27; }
 .metric p { color:#819088; font-size:10px; line-height:1.5; margin:0; }
 .section-row { margin:0 0 18px; align-items:end; }
@@ -114,7 +114,7 @@ body { background: #fff; }
 .next-step-panel { position:relative; background:#eef7f1; border:1px solid #dcece1; border-radius:13px; padding:23px; min-height:252px; overflow:hidden; }
 .side-kicker { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; font:700 9px/1.5 var(--mono); color:#487759; letter-spacing:.035em; }
 .side-status { font:8px/1.4 var(--mono); color:#779b82; text-align:right; max-width:140px; }
-.step-symbol { margin:17px 0 5px; display:flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:50%; color:#c36949; background:#fff; font:25px var(--serif); }
+.step-symbol { margin:17px 0 5px; display:flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:50%; color:#3177a5; background:#fff; font:25px var(--serif); }
 .next-step-panel h2 { font:400 27px/1.12 var(--serif); letter-spacing:-.045em; margin:9px 0; }
 .next-step-panel p { font:11px/1.65 var(--sans); color:#657c6a; margin:0 0 19px; }
 .next-button { border:0; border-radius:7px; background:#24513d; color:white; width:100%; padding:13px 15px; text-align:left; display:flex; justify-content:space-between; gap:12px; font:700 11px var(--sans); }
@@ -225,7 +225,7 @@ dialog { background:#fff; }
  .rail .brand { flex:0 0 100%; margin:0; }
  .rail-nav { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); width:100%; flex:0 0 100%; gap:3px; overflow:visible; }
  .nav-item,.nav-item.active { flex-direction:column; gap:5px; font-size:10px; line-height:1.25; padding:8px 3px; min-height:55px; text-align:center; border-left:0; border-bottom:2px solid transparent; border-radius:7px; justify-content:center; }
- .nav-item.active { border-bottom-color:var(--rust); }
+ .nav-item.active { border-bottom-color:var(--accent); }
  .nav-icon { display:block; width:auto; font-size:18px; }
  .nav-desktop,.nav-arrow,.nav-count { display:none; }
  .nav-mobile { display:block; font:700 10px/1.1 var(--sans); }

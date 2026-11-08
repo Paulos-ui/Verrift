@@ -92,9 +92,9 @@ Save, deploy, then open the actual Vercel URL. The static landing is at `/` and 
 ## 6. Validate the REAL deployed product
 
 1. Open `/` in a private browser: public animated landing loads without an admin password; CTA goes to `/app`.
-2. As Guest A, create a sandbox case, introduce a fault, run a failed check, restore, then verify.
-3. As Guest B, verify Guest A's cases and sandbox state are not visible.
-4. Connect a wallet, approve a SIWE message (not a transaction), sign in. Verify a personal workspace appears.
+2. On `/app`, choose Connect wallet and select an installed provider. Approve the Base Sepolia switch and wallet ownership signature.
+3. As Wallet A, create a controlled test case, introduce a fault, record failure, restore, and verify. As Wallet B, confirm Wallet A's private records are not visible.
+4. From `/app`, choose **Connect wallet**, select a detected provider, approve the Base Sepolia network and the sign-in signature (not a transaction). Verify that the private dashboard loads.
 5. Open the app with a different wallet. Confirm it does not show the first account's projects/cases.
 6. Register a public domain you own, publish DNS TXT or HTTPS file proof, then verify ownership.
 7. Configure Anthropic and record a **live** Claude analysis on a case with observations.

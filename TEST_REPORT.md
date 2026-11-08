@@ -35,3 +35,11 @@ See `DEPLOYMENT.md` for acceptance checklist.
 - `npm run build` is syntax and JSON validation only, not a TypeScript compiler.
 - Full browser navigation to localhost remained blocked by the test environment; external Supabase Auth, Base Sepolia settlement and real Anthropic responses were not live-tested for this UI release.
 - No production Vercel deployment or GitHub push was executed from this workspace.
+
+
+## V6 verification update
+
+- `npm run verify`: 40/40 tests passed on 2026-11-08, including new anonymous access denials and wallet-first UI source assertions. Build is syntax/JSON validation, not TypeScript compilation.
+- Local HTTP GET results: `/` and `/app` returned 200, `/ui-v5.css` and `/ui-v6.css` returned 200, `/api/status` returned 200, unsigned `/api/data` returned 401.
+- Chromium static preview `page.set_content`: 390px / 768px / 1440px, no horizontal overflow or unhandled page errors. Wallet picker opened and showed accurate no-provider state. A controlled injected-provider/fetch mock exercised wallet choice, signed-in dashboard and new-case dialog. This is NOT proof of a live authentication provider.
+- Live production Supabase authentication, provider wallets, Anthropic API calls and Base Sepolia transaction receipts are not verified in this environment.

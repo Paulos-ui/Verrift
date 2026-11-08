@@ -1,0 +1,94 @@
+/* VERRIFT / Pine & Tide. A product-specific visual layer, not a generic theme. */
+:root {
+ --paper:#ffffff;--canvas:#f7faf9;--ink:#172f2a;--sub:#607770;--edge:#e0ebe5;
+ --deep:#123f35;--green:#206954;--accent:#3177a5;--accent-deep:#1b5b84;--sage:#9dd8c8;
+}
+body{background:#fff}
+.rail{background:#153f35;color:#edf9f2;border-right:1px solid #153f35;}
+.brand{color:#fff}
+.brand:hover{color:#fff}
+.brand-icon{background:#e9fff2;color:#143f35}
+.brand-tick{color:#3177a5!important}
+.brand-word small{color:#a2cfc0}
+.rail-divider{background:#3c695c}
+.rail-label{color:#acd7c6}
+.nav-item{color:#c6e5d7;background:transparent}
+.nav-item:hover{color:#fff;background:#2a5649}
+.nav-item.active{background:#e3f7ed;color:#133f34;border-left:3px solid #67c6ae}
+.nav-item.active:hover{color:#133f34;background:#d6f2e5}
+.nav-icon,.nav-item .nav-count{color:#a6d6c2}
+.nav-item.active .nav-icon,.nav-item.active .nav-count{color:#17604c}
+.rail-foot{border-color:#3c695c;color:#bdd9ca}
+.rail-foot p{color:#b1d0c2}
+.rail-link,.text-action{color:#d1ecdf}
+.rail-link:hover,.text-action:hover{color:#fff}
+.shift{color:#a7e7cc}
+.pulse{background:#9de5bf}
+.topbar{background:#fff}
+.wallet-button{background:#153f35;color:#fff;border-color:#153f35}
+.wallet-button:hover{background:#265c4f;color:white}
+.network-pill{background:#e8f7ef;border-color:#d2eadd;color:#23644c}
+.intro-actions .primary,.feature-panel{background:#1b5445;border-color:#1b5445}
+.intro-actions .primary:hover{background:#2c6b56}
+.feature-index span,.feature-panel h2 em,.diagram-fail strong,.diagram-link{color:#b4efdd}
+.metric-dot,.step-symbol,.accent-dot{color:#3177a5}
+.next-step-panel{background:#f0f8f6;border-color:#d9ece3}
+.next-button{background:#1b5445}
+.next-button:hover{background:#286e58}
+/* Public wallet connection home. The backend returns no private data until connected. */
+.welcome-gateway{max-width:1320px;margin:0 auto;padding:41px clamp(20px,3.1vw,48px) 62px;color:#173d33}
+.gateway-topline{display:flex;justify-content:space-between;gap:18px;padding-bottom:20px;border-bottom:1px solid #d8e9df;color:#52816d;font:700 10px var(--mono);letter-spacing:.08em}
+.gateway-grid{display:grid;grid-template-columns:minmax(0,1.07fr) minmax(280px,.75fr);gap:clamp(25px,5vw,90px);padding:clamp(46px,6vw,92px) 0 58px;align-items:center}
+.gateway-copy .eyebrow{font:700 10px var(--mono);letter-spacing:.11em;color:#2f7a61;margin-bottom:23px}
+.gateway-copy h1{font:400 clamp(66px,7vw,126px)/.87 var(--serif);letter-spacing:-.082em;margin:0 0 31px;color:#172f2a}
+.gateway-copy h1 em{color:#3177a5}
+.gateway-copy>p:not(.eyebrow){font:15px/1.82 var(--sans);max-width:475px;color:#556f65;margin:0 0 30px}
+.gateway-connect{border:0;border-radius:9px;display:inline-flex;justify-content:space-between;align-items:center;min-width:245px;gap:35px;background:#174b3c;color:#fff;padding:18px 22px;font-weight:750;font-size:13px;box-shadow:0 11px 30px #0d3c2a14;transition:transform .24s ease,background .2s}
+.gateway-connect:hover{transform:translateY(-3px);background:#236c55}
+.gateway-footnote{display:flex;align-items:center;gap:8px;margin-top:23px;color:#6c9381;font:9px var(--mono)}
+.gateway-signal{width:8px;height:8px;background:#55b78e;border-radius:50%;box-shadow:0 0 0 4px #deeee7}
+.gateway-visual{background:#174b3c;color:#e8f9ed;border:1px solid #174b3c;border-radius:17px;padding:25px;min-height:460px;box-shadow:0 24px 68px #174b3c18;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
+.gateway-visual:before{content:"";position:absolute;width:260px;height:260px;right:-135px;top:-145px;border:1px solid #ffffff24;border-radius:50%;pointer-events:none}
+.gateway-visual-top,.gateway-visual-bottom{display:flex;justify-content:space-between;gap:10px;font:9px var(--mono);color:#b6e1cf;letter-spacing:.08em}
+.gateway-visual-steps{display:flex;flex-direction:column;gap:3px;margin:30px 4px;position:relative}
+.gateway-visual-steps>div:not(.gateway-path){border:1px solid #9fd0b43d;padding:16px 20px;display:grid;grid-template-columns:28px 1fr;gap:3px 14px;border-radius:7px;background:#ffffff0b}
+.gateway-visual-steps>div:not(.gateway-path) span{grid-row:span 2;font:11px var(--mono);color:#96daba}
+.gateway-visual-steps strong{font:700 20px var(--sans);letter-spacing:.025em}
+.gateway-visual-steps small{font:10px var(--mono);color:#acd8c4;margin-top:4px}
+.gateway-path{padding-left:27px;color:#a5e8cc;line-height:1.4}
+.gateway-bottom{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;padding-top:27px;border-top:1px solid #e0ebe5}
+.gateway-bottom>div{border-right:1px solid #e0ebe5;padding-right:18px}
+.gateway-bottom>div:last-child{border-right:0}
+.gateway-number{display:block;font:700 11px var(--mono);color:#3177a5;margin-bottom:19px}
+.gateway-bottom strong{font:700 13px var(--sans);color:#173d33}
+.gateway-bottom p{font:11px/1.7 var(--sans);color:#607770;margin:9px 0 0}
+.gateway-service-error{margin-top:25px;border-left:3px solid #3177a5;background:#f2f8fb;padding:14px;color:#225d7c;font-size:12px;line-height:1.6}
+/* Native wallet picker: only real providers discovered in the browser. */
+.wallet-dialog{border:1px solid #dae7e0;border-radius:14px;padding:0;width:min(480px,calc(100vw - 28px));max-height:min(92vh,780px);box-shadow:0 30px 90px #061f16a0;background:white;color:#193d32}
+.wallet-dialog::backdrop{background:rgba(8,32,24,.64);backdrop-filter:blur(3px)}
+.wallet-dialog-inner{padding:28px clamp(20px,4vw,38px) 31px}
+.wallet-dialog-header{display:flex;justify-content:space-between;align-items:center;gap:15px;font:700 10px var(--mono);color:#4c866c;letter-spacing:.07em}
+.wallet-close{background:#eff6f1;border:0;border-radius:7px;width:34px;height:34px;color:#173d33;font-size:24px;line-height:1}
+.wallet-dialog-icon{display:flex;align-items:baseline;justify-content:center;background:#194d3f;color:white;width:53px;height:53px;border-radius:10px;font:700 39px var(--serif);margin:25px 0 18px}
+.wallet-dialog-icon span{font:700 21px var(--sans);color:#a4e0cc;margin-left:1px}
+.wallet-dialog h2{font:400 clamp(48px,7vw,68px)/.98 var(--serif);letter-spacing:-.065em;margin:0 0 15px}
+.wallet-dialog h2 em{color:#3177a5}
+.wallet-dialog p{font:12px/1.75 var(--sans);color:#597668;margin:0 0 25px}
+.wallet-options{display:flex;flex-direction:column;gap:9px}
+.wallet-option{width:100%;padding:13px;display:flex;align-items:center;gap:13px;text-align:left;border:1px solid #d9e8de;border-radius:9px;background:#fff;color:#173d33;transition:background .2s,border-color .2s}
+.wallet-option:hover,.wallet-option:focus-visible{background:#f1faf5;border-color:#9cceb1}
+.wallet-option-icon{width:43px;height:43px;display:grid;place-items:center;border-radius:9px;background:#e1f1e8;color:#17634a;font:700 23px var(--serif)}
+.wallet-option strong{display:block;font-size:13px}
+.wallet-option small{display:block;color:#6b8b7b;font-size:10px;margin-top:3px}
+.wallet-option-arrow{font-size:22px;color:#3177a5;margin-left:auto}
+.wallet-not-found{background:#f3f8f5;border:1px solid #e0ebe5;border-radius:9px;padding:18px}
+.wallet-not-found strong{font-size:13px}
+.wallet-not-found p{font-size:11px;line-height:1.65;margin:7px 0 14px}
+.wallet-install-links{display:flex;gap:14px;flex-wrap:wrap;font:700 11px var(--sans);color:#246e9d}
+.wallet-install-links a{text-decoration:underline;text-underline-offset:3px}
+.wallet-dialog .wallet-error{background:#fff3f1;border-left:3px solid #bf5146;padding:12px;margin-top:14px;color:#8c3329}
+.wallet-dialog .wallet-privacy{font:9px var(--mono);color:#739688;letter-spacing:.03em;margin:24px 0 0;text-align:center}
+@media(max-width:1050px){.gateway-grid{grid-template-columns:1fr 1fr;gap:25px}.gateway-visual{min-height:380px}.gateway-copy h1{font-size:clamp(56px,7vw,87px)}}
+@media(max-width:850px){.rail{border-right:0;border-bottom:1px solid #336753}.nav-item.active{border-left:0;border-bottom-color:#90e7bb;color:#173d33}.nav-item.active .nav-icon{color:#17604c}}
+@media(max-width:680px){.welcome-gateway{padding:30px 17px 50px}.gateway-grid{display:flex;flex-direction:column;align-items:stretch;padding:35px 0}.gateway-copy h1{font-size:clamp(62px,14vw,94px)}.gateway-copy>p:not(.eyebrow){font-size:14px}.gateway-visual{min-height:360px;padding:20px}.gateway-bottom{grid-template-columns:1fr;gap:0}.gateway-bottom>div{border-right:0;border-bottom:1px solid #e0ebe5;padding:19px 0}.gateway-bottom>div:last-child{border-bottom:0}.gateway-number{margin-bottom:7px}.wallet-dialog-inner{padding:21px}}
+@media(prefers-reduced-motion:reduce){.gateway-connect{transition:none}.wallet-option{transition:none}}

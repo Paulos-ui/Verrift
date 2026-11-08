@@ -15,6 +15,7 @@ test('White Room identity keeps the homepage pure white and the app accessible',
  assert.match(refinement,/\.dashboard-columns/);
  assert.match(refinement,/\[hidden\]\s*\{\s*display:none!important/);
  assert.match(refinement,/@media\(max-width:640px\)/);
+ assert.match(workspace,/href="\/ui-v6\.css"/);
 });
 
 test('Overview cards are built from actual user data and preserve working actions',async()=>{
@@ -23,7 +24,7 @@ test('Overview cards are built from actual user data and preserve working action
  assert.match(source,/const verifiedCases=cases\.filter/);
  assert.match(source,/const proofSteps=/);
  assert.match(source,/cases\.slice\(0,4\)\.map\(caseRow\)/);
- assert.match(source,/data-action="demo-case"/);
+ assert.match(source,/data-action="quick-start-case"/);
  assert.match(source,/data-action="set-sandbox"/);
  assert.match(source,/data-action="new-case"/);
  assert.match(source,/illustration only/gi);

@@ -1,44 +1,20 @@
-# Push VERRIFT updates to `paulos-ui/verrift`
+# Push VERRIFT V6 to `paulos-ui/verrift`
 
-## Extract without mkdir (WSL)
-
-Download `verrift-white-room-v5.zip` to your Windows Desktop. This command creates the `verrift` directory automatically when needed and preserves its `.git` folder when one exists:
+Download `verrift-pine-tide-v6.zip` to your Windows Desktop. The existing project is under `Desktop/verrift`. Run this in WSL; it updates the same folder and preserves `.git`:
 
 ```bash
-cd "/mnt/c/Users/MY PC/Desktop" && unzip -oq "verrift-white-room-v5.zip" -d "verrift" && cd "verrift"
-```
-
-Check the code:
-
-```bash
-rm -f server.js  # Remove legacy Vercel auto-detected server entrypoint
+cd "/mnt/c/Users/MY PC/Desktop/verrift"
+unzip -oq "/mnt/c/Users/MY PC/Desktop/verrift-pine-tide-v6.zip" -d . && rm -f "/mnt/c/Users/MY PC/Desktop/verrift-pine-tide-v6.zip" server.js
 npm ci
 npm run verify
 git status --short
-```
-
-If you already pushed the repo to GitHub, **do not run `git init` again**:
-
-```bash
 git add -A
-git commit -m "Refine VERRIFT white workspace and evidence dashboard"
+git commit -m "Launch VERRIFT Pine and Tide wallet-first workspace"
 git push origin HEAD
 ```
 
-If this is the first time, create an empty `paulos-ui/verrift` GitHub repository and run:
+If Git reports no changes, do not create an empty commit. If `origin` is not configured, create a repository at `https://github.com/paulos-ui/verrift` first and set the remote. If your existing repo is not `Desktop/verrift`, change only the folder path.
 
-```bash
-git init
-git branch -M main
-git remote add origin https://github.com/paulos-ui/verrift.git
-git add -A
-git commit -m "Launch VERRIFT public wallet platform"
-git push -u origin main
-```
+**Vercel:** Pushes to the connected production branch normally trigger a deployment. The deployment settings and variables do not need changes solely for this visual/wallet-choice update. Confirm Supabase (including `supabase/schema.sql`, Ethereum/Web3 Auth) and `SESSION_SECRET`, `PUBLIC_ORIGIN`, and Anthropic variables are configured. Check `/api/status`, then perform a full live wallet and test flow.
 
-Always confirm the `.env` file remains excluded. For Vercel deployment, see `DEPLOYMENT.md`.
-
-
-### What changed in this ZIP
-
-The existing public interactive landing page stays at `/`, now on a white canvas. The `/app` dashboard gains a white navigation rail, verified metrics, guided proof flow, accessible mobile labels and informative real-data panels. The old `server.js` must still be removed after unzipping if present locally. For the existing database startup error, see `VERCEL_DATABASE_NEXT.md`.
+The ZIP excludes `.env`, private credentials, local runtime state, browser test mocks and generated screenshots.

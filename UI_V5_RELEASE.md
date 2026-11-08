@@ -21,4 +21,4 @@
 
 - The static workspace screenshots use an empty guest-state fixture solely for visual review, not a real Supabase login or live user session.
 - Chromium navigation to local URLs is blocked in the test environment. Live end-to-end navigation, connected Supabase, Anthropic, wallet sign-in and onchain settlement must be verified on Vercel.
-- A green Vercel build does not confirm a working database. Check `/api/status` and a complete guest sandbox flow after deployment.
+- A green Vercel build does not confirm a working database. Check `/api/status` and a connected-wallet controlled-test flow after deployment.

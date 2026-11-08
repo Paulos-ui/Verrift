@@ -1,11 +1,11 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#ffffff"><meta name="description" content="VERRIFT. From broken software to proven repairs, with evidence-first verification and Base Sepolia rewards."><title>VERRIFT | The Proof-of-Fix Network</title><meta property="og:title" content="VERRIFT | The Proof-of-Fix Network"><meta property="og:description" content="Reproduce the failure. Verify the repair. Record the evidence on Base."><meta property="og:type" content="website"><meta name="twitter:card" content="summary"><link rel="icon" type="image/svg+xml" href="/mark.svg"><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/ui-v5.css"><script type="module" src="/app.js"></script></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#ffffff"><meta name="description" content="VERRIFT. From broken software to proven repairs, with evidence-first verification and Base Sepolia rewards."><title>VERRIFT | The Proof-of-Fix Network</title><meta property="og:title" content="VERRIFT | The Proof-of-Fix Network"><meta property="og:description" content="Reproduce the failure. Verify the repair. Record the evidence on Base."><meta property="og:type" content="website"><meta name="twitter:card" content="summary"><link rel="icon" type="image/svg+xml" href="/mark.svg"><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/ui-v5.css"><link rel="stylesheet" href="/ui-v6.css"><script type="module" src="/app.js"></script></head>
 <body>
 <div class="shell">
  <aside class="rail" aria-label="Primary navigation">
    <a class="brand" href="/" aria-label="VERRIFT home"><span class="brand-icon">V<span class="brand-tick">/</span></span><span class="brand-word">VERRIFT<small>THE PROOF-OF-FIX NETWORK</small></span></a>
-   <div class="rail-divider"></div><div class="rail-label">PUBLIC LAB / MULTI-USER</div>
+   <div class="rail-divider"></div><div class="rail-label">CONNECTED WORKSPACE / BASE</div>
    <nav class="rail-nav" aria-label="Workspace">
     <button type="button" data-view="overview" class="nav-item active"><span class="nav-icon">▦</span> <span class="nav-desktop">Overview</span><span class="nav-mobile">Overview</span> <span class="nav-arrow">↗</span></button>
     <button type="button" data-view="cases" class="nav-item"><span class="nav-icon">⌁</span> <span class="nav-desktop">Repair cases</span><span class="nav-mobile">Cases</span> <span id="case-counter" class="nav-count">0</span></button>
@@ -15,12 +15,22 @@
    <div class="rail-foot"><div class="shift"><span class="pulse" aria-hidden="true"></span> SHIFT 02 / LIVE BUILD</div><p>Proof over promises.<br>Every result has a source.</p><a class="rail-link" href="https://sepolia.basescan.org" target="_blank" rel="noopener noreferrer">Base Sepolia explorer ↗</a><a class="rail-link" href="/admin" id="admin-link" hidden>Operator console ↗</a><button type="button" id="logout" class="text-action" hidden>Sign out</button></div>
  </aside>
  <div class="app-body">
-  <header class="topbar"><div class="mobile-brand">VERRIFT <span class="small-accent">/</span></div><div class="crumb"><a href="/" title="Visit public home">HOME ↗</a> &nbsp; WORKSPACE <span>/</span> <strong id="crumb-view">OVERVIEW</strong></div><div class="topbar-right"><span class="network-pill">● BASE SEPOLIA <i>TESTNET</i></span><button type="button" id="wallet-button" class="wallet-button">Sign in with wallet <span>↗</span></button></div></header>
-  <main id="content" tabindex="-1" aria-live="polite"><div class="loader">Opening the evidence room…</div></main>
+  <header class="topbar"><div class="mobile-brand">VERRIFT <span class="small-accent">/</span></div><div class="crumb"><a href="/" title="Visit public home">HOME ↗</a> &nbsp; WORKSPACE <span>/</span> <strong id="crumb-view">OVERVIEW</strong></div><div class="topbar-right"><span class="network-pill">● BASE SEPOLIA <i>TESTNET</i></span><button type="button" id="wallet-button" class="wallet-button">Connect wallet <span>↗</span></button></div></header>
+  <main id="content" tabindex="-1" aria-live="polite"><div class="loader">Loading your workspace...</div></main>
   <footer class="main-footer"><span>VERRIFT / EVERY FIX LEAVES EVIDENCE.</span><span>BUILD BY JAYKING · <a href="https://github.com/paulos-ui" target="_blank" rel="noopener">GITHUB ↗</a></span></footer>
  </div>
 </div>
 <div id="toast" role="status" aria-live="polite" class="toast" hidden></div>
 <dialog id="dialog" aria-labelledby="dialog-title"><div class="dialog-wrap"><div class="dialog-head"><h2 id="dialog-title">New case</h2><button class="dialog-x" type="button" id="dialog-close" aria-label="Close dialog">×</button></div><div id="dialog-body"></div></div></dialog>
-<div id="login-screen" class="auth-screen" hidden><div class="auth-panel"><a href="/" class="auth-logo">VERRIFT <b>/</b></a><div class="auth-symbol" aria-hidden="true"><i>V</i><span>PUBLIC LAB / PERSONAL ACCOUNT</span></div><p class="eyebrow">YOUR OWN EVIDENCE ROOM</p><h1>Sign in.<br><em>Prove the work.</em></h1><p class="muted">Anyone can explore the sandbox for free. Sign in with your own wallet to register domains, save private cases, request Claude analysis and verify Base Sepolia transactions. No admin password required.</p><button type="button" class="primary wide" id="sign-in-action">Connect wallet and sign in <span>↗</span></button><button type="button" class="ghost wide" id="auth-close">Continue exploring as guest ↗</button><p id="login-error" role="alert" class="error-text"></p><div class="auth-bottom">ONE WALLET / ONE PRIVATE WORKSPACE / BASE SEPOLIA</div></div><div class="auth-visual"><div class="visual-top">CASE RECORD / V/001 <span>■</span></div><div class="visual-center"><p class="visual-meta">OWNERSHIP VERIFIED</p><div class="visual-ring"><span>↗</span></div><div class="visual-rule"></div><p class="visual-quote">A fix is not a fix<br>until it survives<br>the same test.</p></div><div class="visual-bottom"><span>CAPTURE → VERIFY → REWARD</span><span>VERRIFT®</span></div></div></div>
+<dialog id="wallet-picker" class="wallet-dialog" aria-labelledby="wallet-picker-title" aria-describedby="wallet-picker-description">
+ <div class="wallet-dialog-inner">
+  <div class="wallet-dialog-header"><span>VERRIFT / WALLET ACCESS</span><button id="wallet-picker-close" type="button" class="wallet-close" aria-label="Close wallet selection">×</button></div>
+  <div class="wallet-dialog-icon" aria-hidden="true">V<span>/</span></div>
+  <h2 id="wallet-picker-title">Choose your<br><em>wallet.</em></h2>
+  <p id="wallet-picker-description">Connect a wallet to create repair cases, verify your websites and preserve evidence. Your wallet may ask you to switch to Base Sepolia and sign a login message. Signing in does not transfer funds.</p>
+  <div id="wallet-options" class="wallet-options" aria-live="polite"><span>Looking for available wallets...</span></div>
+  <p id="wallet-picker-error" class="wallet-error" role="alert" hidden></p>
+  <p class="wallet-privacy">NO PASSWORDS · NO PRIVATE KEYS · BASE SEPOLIA TESTNET</p>
+ </div>
+</dialog>
 </body></html>

@@ -1,6 +1,7 @@
-import {connectWallet,currentWallet,walletBalance,sendEth,anchorEvidence,signInMessage,watchWalletChanges,EXPLORER} from './wallet.js';
+import {availableWallets,connectWallet,currentWallet,walletBalance,sendEth,anchorEvidence,signInMessage,watchWalletChanges,EXPLORER} from './wallet.js';
 const $=s=>document.querySelector(s);
 const state={view:'overview',data:null,selected:null,wallet:null,actor:{role:'guest',wallet:null},aiEnabled:false,pending:null,focus:null};
+let walletChoices=[]; 
 const escapeHTML=s=>String(s??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;');
 const e=escapeHTML;
 const dt=s=>new Date(s).toLocaleString(undefined,{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
@@ -13,9 +14,20 @@ async function api(url,options={}){
 }
 const post=(url,value={})=>api(url,{method:'POST',body:JSON.stringify(value)});
 const statusTag=(name)=>{const good=name==='verified'||name==='passing';return `<span class="status-tag ${good?'good':name==='failing'?'bad':'neutral'}"><span aria-hidden="true">●</span> ${e(name)}</span>`;};
-async function refresh(){const result=await api('/api/data');state.data=result;render();}
-function menu(view){state.view=view;document.querySelectorAll('[data-view]').forEach(button=>{button.classList.toggle('active',button.dataset.view===view)});$('#crumb-view').textContent=view.toUpperCase();render();}
-function render(){if(!state.data)return;$('#case-counter').textContent=state.data.cases.length;const content=$('#content');if(state.view==='overview')content.innerHTML=overview();if(state.view==='cases')content.innerHTML=casesPage();if(state.view==='domains')content.innerHTML=domainsPage();}
+async function refresh(){if(state.actor.role!=='user'){state.data=null;renderPublicHome();return;}const result=await api('/api/data');state.data=result;render();}
+function menu(view){if(state.actor.role!=='user'){renderPublicHome();showWalletPicker();return;}state.view=view;document.querySelectorAll('[data-view]').forEach(button=>{button.classList.toggle('active',button.dataset.view===view)});$('#crumb-view').textContent=view.toUpperCase();render();}
+function render(){if(!state.data)return;$('#crumb-view').textContent=state.view.toUpperCase();$('#case-counter').textContent=state.data.cases.length;const content=$('#content');if(state.view==='overview')content.innerHTML=overview();if(state.view==='cases')content.innerHTML=casesPage();if(state.view==='domains')content.innerHTML=domainsPage();}
+function renderPublicHome(error='') {
+ const content=$('#content');
+ $('#case-counter').textContent='';
+ $('#crumb-view').textContent='HOME';
+ content.innerHTML=`<div class="welcome-gateway"><div class="gateway-topline"><span>WELCOME TO VERRIFT</span><span>01 / 04 · YOUR WORKSPACE</span></div>
+  <div class="gateway-grid"><div class="gateway-copy"><p class="eyebrow">EVIDENCE-DRIVEN SOFTWARE REPAIR</p><h1>Your work.<br><em>Your proof.</em></h1><p>VERRIFT helps teams document what broke, run a repeatable verification check, and preserve the outcome. Connect a wallet to begin your own repair record.</p><button class="gateway-connect" type="button" data-action="connect-wallet">Connect wallet <span>↗</span></button><div class="gateway-footnote"><span class="gateway-signal"></span> NO PASSWORD REQUIRED · SIGNATURE-BASED ACCESS</div></div>
+   <div class="gateway-visual" aria-label="How proof-of-fix works"><div class="gateway-visual-top">THE EVIDENCE FLOW <span>V / 001</span></div><div class="gateway-visual-steps"><div><span>01</span><strong>CAPTURE</strong><small>Record the failed check</small></div><div class="gateway-path">↓</div><div><span>02</span><strong>VERIFY</strong><small>Rerun unchanged criteria</small></div><div class="gateway-path">↓</div><div><span>03</span><strong>PROVE</strong><small>Preserve a Base receipt</small></div></div><div class="gateway-visual-bottom">BUILT ON BASE SEPOLIA · TESTNET</div></div></div>
+  <div class="gateway-bottom"><div><span class="gateway-number">01 /</span><strong>Private evidence records</strong><p>Your cases are isolated to your authenticated wallet.</p></div><div><span class="gateway-number">02 /</span><strong>Authorized website checks</strong><p>Ownership verification keeps external testing in scope.</p></div><div><span class="gateway-number">03 /</span><strong>Claude + Base</strong><p>AI analysis and confirmed onchain proof are available after connection.</p></div></div>
+  ${error?`<p class="gateway-service-error" role="alert">Workspace service unavailable: ${e(error)}. You can still explore the public website and documentation.</p>`:''}
+ </div>`;
+}
 const lens=()=>{
  const {cases,runs,payouts,projects}=state.data;
  return [{n:String(cases.length).padStart(2,'0'),label:'REPAIR CASES',note:'In the evidence register'}, {n:String(runs.length).padStart(2,'0'),label:'CHECKS EXECUTED',note:'Measured, not estimated'}, {n:String(cases.filter(c=>c.status==='verified').length).padStart(2,'0'),label:'REPAIRS VERIFIED',note:'Fail → pass sequence'}, {n:String(payouts.length).padStart(2,'0'),label:'CHAIN RECEIPTS',note:'Base Sepolia confirmations'}];
@@ -23,7 +35,7 @@ const lens=()=>{
 function overview(){
  const {cases,runs,sandbox,projects,payouts,anchors}=state.data;
  const recent=[...runs].slice(-4).reverse();
- const isGuest=state.actor.role!=='user';
+
  const hasChecks=runs.length>0;
  const verifiedCases=cases.filter(c=>c.status==='verified');
  const untestedCase=cases.find(c=>!runs.some(r=>r.caseId===c.id));
@@ -35,28 +47,28 @@ function overview(){
   {name:'Anchor the evidence',detail:'Submit a fingerprint on Base Sepolia',done:anchors.length>0},
   {name:'Confirm a reward',detail:'Verify the real testnet payment receipt',done:payouts.length>0}
  ];
- let next={index:'START HERE',title:'Try the live repair sandbox',body:'No setup or wallet needed. Introduce a fault, run a check, restore the service, and prove the change.',action:'demo-case',label:'Create a demo case'};
+ let next={index:'START HERE',title:'Start with a real check',body:'Create a case against the controlled test target, introduce a fault, then rerun the same criteria after restoring the service.',action:'quick-start-case',label:'Create your first case'};
  if(untestedCase)next={index:'YOUR NEXT STEP',title:'Capture your first observation',body:'Your case is ready. Run its locked acceptance criteria to start an evidence trail.',action:'run',id:untestedCase.id,label:'Run the case check'};
  else if(failingCase)next={index:'YOUR NEXT STEP',title:'Recheck the repair',body:'A failing observation is recorded. Restore the target and run the identical test to establish proof.',action:'run',id:failingCase.id,label:'Run the same check'};
  else if(latestVerified)next={index:'YOUR NEXT STEP',title:'Make this proof portable',body:'This case has a verified repair. Open its evidence to review the fingerprint and Base anchoring options.',action:'open',id:latestVerified.id,label:'Open verified case'};
  else if(cases.length)next={index:'KEEP GOING',title:'Explore the evidence register',body:'Your latest checks have been recorded. Open a case to inspect observations, share evidence, or begin another repair.',action:'cases',label:'Browse repair cases'};
- const actionHtml=next.action==='run'?`<button class="next-button" data-action="run" data-id="${e(next.id)}">${e(next.label)} <span>↗</span></button>`:next.action==='open'?`<button class="next-button" data-case="${e(next.id)}">${e(next.label)} <span>↗</span></button>`:next.action==='cases'?`<button class="next-button" data-view="cases">${e(next.label)} <span>↗</span></button>`:`<button class="next-button" data-action="demo-case">${e(next.label)} <span>↗</span></button>`;
+ const actionHtml=next.action==='run'?`<button class="next-button" data-action="run" data-id="${e(next.id)}">${e(next.label)} <span>↗</span></button>`:next.action==='open'?`<button class="next-button" data-case="${e(next.id)}">${e(next.label)} <span>↗</span></button>`:next.action==='cases'?`<button class="next-button" data-view="cases">${e(next.label)} <span>↗</span></button>`:`<button class="next-button" data-action="quick-start-case">${e(next.label)} <span>↗</span></button>`;
  return `<div class="dashboard-intro">
-  <div><p class="eyebrow">VERRIFT / WORKSPACE OVERVIEW</p><h1>${isGuest?'Welcome to the <em>evidence room.</em>':'Your proof, <em>all in one place.</em>'}</h1><p class="dashboard-subtitle">${isGuest?'Explore a working repair flow. You can try the sandbox before connecting a wallet.':`Connected workspace ${e(trimWallet(state.actor.wallet))}. Your cases and their evidence stay separate from other users.`}</p></div>
-  <div class="intro-actions"><span class="workspace-chip"><i></i> ${isGuest?'GUEST MODE':'WALLET ACCOUNT'}</span><button class="primary" data-action="new-case">+ New repair case</button></div>
+  <div><p class="eyebrow">VERRIFT / WORKSPACE OVERVIEW</p><h1>Your proof, <em>all in one place.</em></h1><p class="dashboard-subtitle">Connected workspace ${e(trimWallet(state.actor.wallet))}. Your cases and their evidence stay separate from other users.</p></div>
+  <div class="intro-actions"><span class="workspace-chip"><i></i> ${state.wallet?'WALLET CONNECTED':'ACCOUNT SESSION'}</span><button class="primary" data-action="new-case">+ New repair case</button></div>
  </div>
  <div class="dashboard-columns"><div class="dashboard-main-column">
  <section class="feature-panel" aria-label="Live repair lab">
-  <div class="feature-copy"><span class="feature-index">THE LIVE REPAIR LAB <span>↗</span></span><h2>See the failure.<br><em>Prove the fix.</em></h2><p>A real, repeatable test. Record what broke, restore the sample service, and compare the evidence. No fabricated results.</p><div class="feature-actions"><button class="feature-cta" data-action="demo-case">Try the interactive sandbox <span>↗</span></button><a href="/docs">How verification works ↗</a></div></div>
+  <div class="feature-copy"><span class="feature-index">THE LIVE REPAIR LAB <span>↗</span></span><h2>See the failure.<br><em>Prove the fix.</em></h2><p>A real, repeatable test. Record what broke, restore the sample service, and compare the evidence. No fabricated results.</p><div class="feature-actions"><button class="feature-cta" data-action="quick-start-case">Start a verification case <span>↗</span></button><a href="/docs">How verification works ↗</a></div></div>
   <div class="feature-diagram" aria-label="Illustrated failure-to-repair process"><div class="diagram-label">V/ EVIDENCE FLOW <span>01 / 03</span></div><div class="diagram-cards"><div class="diagram-fail"><span>01 / RECORD</span><strong>FAIL</strong><small>Observe the fault</small></div><span class="diagram-link" aria-hidden="true">→</span><div class="diagram-pass"><span>02 / RECHECK</span><strong>PASS</strong><small>Same test, new result</small></div></div><div class="diagram-caption">ILLUSTRATION ONLY · RUN THE SANDBOX FOR REAL PROOF</div></div>
  </section>
  <section class="metric-row" aria-label="Real workspace metrics">${lens().map((m,i)=>`<div class="metric"><div class="metric-label"><span class="metric-dot">${['◉','↗','✓','⌁'][i]}</span>${m.label}</div><div class="metric-value">${m.n}</div><p>${m.note}</p></div>`).join('')}</section>
- <div class="section-row"><div><div class="eyebrow">YOUR WORK / CASE REGISTER</div><h2>Recent repair cases<span class="accent-dot">.</span></h2><p class="section-description">Evidence from your ${isGuest?'guest session':'wallet workspace'}. No sample counts or fabricated history.</p></div><button class="line-button" data-view="cases">View all cases <span>↗</span></button></div>
- ${cases.length?`<div class="case-feed">${cases.slice(0,4).map(caseRow).join('')}</div>`:`<div class="empty-ledger"><div class="empty-icon" aria-hidden="true">⌁</div><div><h3>Your first proof starts here.</h3><p>Create a sandbox case to capture an actual failure and repair.</p></div><button class="small-button" data-action="demo-case">Start demo ↗</button></div>`}
+ <div class="section-row"><div><div class="eyebrow">YOUR WORK / CASE REGISTER</div><h2>Recent repair cases<span class="accent-dot">.</span></h2><p class="section-description">Evidence from your connected wallet. No sample counts or fabricated history.</p></div><button class="line-button" data-view="cases">View all cases <span>↗</span></button></div>
+ ${cases.length?`<div class="case-feed">${cases.slice(0,4).map(caseRow).join('')}</div>`:`<div class="empty-ledger"><div class="empty-icon" aria-hidden="true">⌁</div><div><h3>Your first proof starts here.</h3><p>Create your first case to capture an actual failure and repair.</p></div><button class="small-button" data-action="quick-start-case">Create first case ↗</button></div>`}
  <section class="sandbox-panel refined-sandbox"><div class="panel-top"><span>TEST ENVIRONMENT / LIVE STATE</span><span class="marker ${sandbox.broken?'marker-bad':'marker-good'}">${sandbox.broken?'● DEGRADED':'● OPERATIONAL'}</span></div><div class="sandbox-split"><div><h3>Control the<br><em>test target.</em></h3><p>These buttons change the sample service's actual state. Run the case check afterward to see a recorded result.</p></div><div class="sandbox-controls"><button class="pill-dark" data-action="set-sandbox" data-broken="true">Introduce fault <span>↗</span></button><button class="pill-light" data-action="set-sandbox" data-broken="false">Restore service <span>↗</span></button><a href="/sandbox" class="small-link" target="_blank" rel="noopener">Inspect live target ↗</a></div></div></section>
  </div>
  <aside class="dashboard-side" aria-label="Workspace guidance and activity">
-  <section class="next-step-panel"><div class="side-kicker">${e(next.index)} <span class="side-status">${isGuest?'NO WALLET REQUIRED FOR DEMO':'PERSONAL WORKSPACE'}</span></div><div class="step-symbol" aria-hidden="true">↗</div><h2>${e(next.title)}</h2><p>${e(next.body)}</p>${actionHtml}</section>
+  <section class="next-step-panel"><div class="side-kicker">${e(next.index)} <span class="side-status">PRIVATE WORKSPACE</span></div><div class="step-symbol" aria-hidden="true">↗</div><h2>${e(next.title)}</h2><p>${e(next.body)}</p>${actionHtml}</section>
   <section class="proof-guide"><div class="side-kicker">YOUR PROOF PATH <span>${proofSteps.filter(p=>p.done).length}/4 COMPLETE</span></div><h3>From discovery to evidence</h3><ol class="proof-step-list">${proofSteps.map((step,i)=>`<li class="${step.done?'complete':''}"><span class="proof-step-marker">${step.done?'✓':String(i+1).padStart(2,'0')}</span><div><strong>${e(step.name)}</strong><small>${e(step.detail)}</small></div></li>`).join('')}</ol><small class="proof-disclaimer">Progress reflects recorded evidence, not a simulated achievement.</small></section>
   <section class="activity-panel dashboard-activity"><div class="panel-top"><span>ACTIVITY / ACTUAL TEST RUNS</span><span>RECENT</span></div><h3>Latest observations</h3>${recent.length?recent.map(r=>{const c=cases.find(x=>x.id===r.caseId);return `<button class="activity-item" data-case="${e(r.caseId)}"><span class="activity-state ${r.passed?'good-ink':'bad-ink'}">${r.passed?'✓':'×'}</span><span><strong>${e(c?.title||'Archived case')}</strong><small>${r.passed?'Check passed':'Check failed'} · ${dt(r.createdAt)}</small></span><span>↗</span></button>`;}).join(''):`<p class="subtle-empty">Your test history will appear here after the first recorded check.</p>`}<button class="text-link" data-view="cases">See the evidence ledger ↗</button></section>
   <section class="network-note"><span class="network-indicator" aria-hidden="true">◎</span><div><strong>BASE SEPOLIA</strong><p>Proof anchors and rewards use testnet transactions, not mainnet funds.</p><a href="https://sepolia.basescan.org" target="_blank" rel="noopener noreferrer">Explore verified transactions ↗</a></div></section>
@@ -64,7 +76,7 @@ function overview(){
  <div class="footnote">SECURITY / OWNERSHIP-VERIFIED TARGETS ONLY <span>∗</span> VERIFY RESULTS BEFORE PUBLISHING OR PAYING REWARDS.</div>`;
 }
 function caseRow(c){const {runs}=state.data;const last=[...runs].reverse().find(r=>r.caseId===c.id);return `<button class="case-item" data-case="${e(c.id)}"><span class="case-mark">${c.kind==='sandbox'?'◇':'⌘'}</span><span class="case-title"><strong>${e(c.title)}</strong><small>${e(c.kind==='sandbox'?'Built-in sandbox':state.data.projects.find(p=>p.id===c.projectId)?.domain||'Verified property')} · ${dt(c.createdAt)}</small></span>${statusTag(c.status)}<span class="case-time">${last?`${dt(last.createdAt)}`:'NOT TESTED'}</span><span class="case-chevron">↗</span></button>`;}
-function casesPage(){const cases=state.data.cases;const active=cases.find(c=>c.id===state.selected);return `<div class="page-head"><div class="eyebrow">02 / INCIDENT REGISTER</div><h1>Repair cases<span class="accent-dot">.</span></h1><p>Every case is immutable once its test criteria are recorded. Proof means rerunning those same assertions after a real change.</p><div class="head-actions"><button class="primary" data-action="new-case">Create case ↗</button><button class="ghost" data-action="demo-case">Use sample target ↗</button></div></div>${!cases.length?`<div class="blank-record"><div class="blank-symbol">V / Ø</div><h2>The register is empty.</h2><p>Open a case to begin a real evidence trail.</p></div>`:`<div class="cases-layout"><section class="case-list"><div class="ledger-head">CASE REGISTER <span>${cases.length} RECORDS</span></div>${cases.map(c=>`<button class="ledger-item ${active?.id===c.id?'selected':''}" data-case="${e(c.id)}"><span class="ledger-index">${c.kind==='sandbox'?'LAB':'WEB'}</span><strong>${e(c.title)}</strong>${statusTag(c.status)}<small>${dt(c.createdAt)}</small></button>`).join('')}</section><section class="case-detail">${active?detail(active):`<div class="no-selection"><div>⌗</div><h3>Select a case to view its evidence</h3><p>Checks, Claude analysis, reports and Base reward settlement live here.</p></div>`}</section></div>`}`;}
+function casesPage(){const cases=state.data.cases;const active=cases.find(c=>c.id===state.selected);return `<div class="page-head"><div class="eyebrow">02 / INCIDENT REGISTER</div><h1>Repair cases<span class="accent-dot">.</span></h1><p>Every case is immutable once its test criteria are recorded. Proof means rerunning those same assertions after a real change.</p><div class="head-actions"><button class="primary" data-action="new-case">Create case ↗</button><button class="ghost" data-action="quick-start-case">Use sample target ↗</button></div></div>${!cases.length?`<div class="blank-record"><div class="blank-symbol">V / Ø</div><h2>The register is empty.</h2><p>Open a case to begin a real evidence trail.</p></div>`:`<div class="cases-layout"><section class="case-list"><div class="ledger-head">CASE REGISTER <span>${cases.length} RECORDS</span></div>${cases.map(c=>`<button class="ledger-item ${active?.id===c.id?'selected':''}" data-case="${e(c.id)}"><span class="ledger-index">${c.kind==='sandbox'?'LAB':'WEB'}</span><strong>${e(c.title)}</strong>${statusTag(c.status)}<small>${dt(c.createdAt)}</small></button>`).join('')}</section><section class="case-detail">${active?detail(active):`<div class="no-selection"><div>⌗</div><h3>Select a case to view its evidence</h3><p>Checks, Claude analysis, reports and Base reward settlement live here.</p></div>`}</section></div>`}`;}
 function detail(c){const {runs,analyses,payouts,anchors,projects}=state.data;const history=runs.filter(r=>r.caseId===c.id).reverse();const last=history[0];const analysesFor=analyses.filter(a=>a.caseId===c.id);const payout=payouts.find(p=>p.caseId===c.id);const anchor=anchors.find(a=>a.caseId===c.id);const domain=projects.find(p=>p.id===c.projectId)?.domain;const recentFailure=history.find(r=>!r.passed);const currentSuccess=history[0]?.passed?history[0]:null;
  return `<div class="detail-eyebrow">CASE FILE <span>${e(c.id.slice(-8).toUpperCase())}</span></div><div class="detail-title-row"><h2>${e(c.title)}</h2>${statusTag(c.status)}</div><p class="detail-description">${e(c.description)}</p><div class="detail-meta"><span>PROPERTY <strong>${e(domain||'INTERNAL SANDBOX')}</strong></span><span>ROUTE <strong>${e(c.path)}</strong></span></div>
  ${c.status==='verified'&&recentFailure&&currentSuccess?`<div class="proof-delta"><div><small>BEFORE / FAILURE</small><strong class="bad-ink">${e(recentFailure.observation?.status||'FAILED')} <span>✕</span></strong><p>${e(recentFailure.id)}</p></div><div class="delta-bridge">→</div><div><small>AFTER / RECHECK</small><strong class="good-ink">${e(currentSuccess.observation?.status||'PASSED')} <span>✓</span></strong><p>${e(currentSuccess.id)}</p></div><div class="delta-verdict">REPAIR VERIFIED<br><span>SAME TEST. NEW OUTCOME.</span></div></div>`:''}
@@ -75,38 +87,63 @@ function detail(c){const {runs,analyses,payouts,anchors,projects}=state.data;con
  <div class="detail-section"><div class="detail-label">BASE / VERIFIED REWARD</div><p class="microcopy">Only Base Sepolia test ETH. Payouts are direct wallet transfers after a failed-to-passing proof sequence; this MVP does not escrow funds.</p>${payout?`<div class="payout-receipt"><strong>✓ PAYMENT VERIFIED ONCHAIN</strong><div>${e(payout.amountEth)} TEST ETH → ${e(payout.to)}</div><a target="_blank" rel="noopener noreferrer" href="${e(payout.explorer)}">View Base transaction ↗</a></div>`:c.reward?`<div class="reward-card"><div>OFFERED REWARD <strong>${e(c.reward.amountEth)} TEST ETH</strong></div><div>TO <strong>${e(c.reward.to)}</strong></div></div><button class="small-button" data-action="pay" data-id="${e(c.id)}" ${c.status!=='verified'?'disabled title="A failed run followed by a passing run is required"':''}>${c.status==='verified'?'Send real testnet reward ↗':'Awaiting verified repair'}</button><button class="tiny-under" data-action="verify-existing" data-id="${e(c.id)}">Verify an existing transaction hash ↗</button>`:`<button class="small-button" data-action="configure-reward" data-id="${e(c.id)}">Specify testnet reward ↗</button>`}</div>
  <div class="detail-section detail-actions"><button class="line-button" data-action="export" data-id="${e(c.id)}">↓ Export JSON</button><button class="line-button" data-action="share" data-id="${e(c.id)}">↗ Share evidence link</button>${payout?'':`<button class="line-button danger" data-action="delete" data-id="${e(c.id)}">Delete case</button>`}</div>`;
 }
-function domainsPage(){const items=state.data.projects;return `<div class="page-head"><div class="eyebrow">03 / AUTHORIZED PROPERTIES</div><h1>Verified domains<span class="accent-dot">.</span></h1><p>VERRIFT refuses external checks until the website owner publishes a DNS TXT record or HTTPS proof file. No arbitrary target scanning.</p><div class="head-actions"><button class="primary" data-action="add-domain">${state.actor.role==='guest'?'Sign in to register a domain':'Register property'} ↗</button></div></div><div class="domain-body">${items.length?items.map(p=>`<article class="domain-item"><div class="domain-icon">◎</div><div class="domain-main"><h3>${e(p.domain)}</h3><small>REGISTERED ${dt(p.createdAt)} · ${e(p.id)}</small><div class="proof-instructions"><strong>VERIFY WITH DNS</strong><code>_verrift-challenge.${e(p.domain)} TXT "verrift=${e(p.verificationToken)}"</code><strong>OR HTTPS FILE</strong><code>https://${e(p.domain)}/.well-known/verrift/${e(p.verificationToken)}.txt</code><small>File contents must equal: ${e(p.verificationToken)}</small></div></div><div class="domain-right">${p.verifiedAt?statusTag('verified'):`<button class="small-button" data-action="verify-domain" data-id="${e(p.id)}">Check proof ↗</button>`}</div></article>`).join(''):`<div class="blank-record"><div class="blank-symbol">◎ / Ø</div><h2>No external properties registered.</h2><p>Use the built-in sandbox now, or register a real public domain you control.</p></div>`}</div><div class="safety-note"><strong>AN AUTHORIZATION BOUNDARY, NOT A PENETRATION TEST.</strong><p>Checks are limited to same-domain, public HTTPS GET requests, with pinned DNS resolution, short timeouts and response size limits. They do not brute force, exploit or crawl.</p></div>`;}
+function domainsPage(){const items=state.data.projects;return `<div class="page-head"><div class="eyebrow">03 / AUTHORIZED PROPERTIES</div><h1>Verified domains<span class="accent-dot">.</span></h1><p>VERRIFT refuses external checks until the website owner publishes a DNS TXT record or HTTPS proof file. No arbitrary target scanning.</p><div class="head-actions"><button class="primary" data-action="add-domain">Register property ↗</button></div></div><div class="domain-body">${items.length?items.map(p=>`<article class="domain-item"><div class="domain-icon">◎</div><div class="domain-main"><h3>${e(p.domain)}</h3><small>REGISTERED ${dt(p.createdAt)} · ${e(p.id)}</small><div class="proof-instructions"><strong>VERIFY WITH DNS</strong><code>_verrift-challenge.${e(p.domain)} TXT "verrift=${e(p.verificationToken)}"</code><strong>OR HTTPS FILE</strong><code>https://${e(p.domain)}/.well-known/verrift/${e(p.verificationToken)}.txt</code><small>File contents must equal: ${e(p.verificationToken)}</small></div></div><div class="domain-right">${p.verifiedAt?statusTag('verified'):`<button class="small-button" data-action="verify-domain" data-id="${e(p.id)}">Check proof ↗</button>`}</div></article>`).join(''):`<div class="blank-record"><div class="blank-symbol">◎ / Ø</div><h2>No external properties registered.</h2><p>Register a real public domain you control, or create a case against the controlled test target.</p></div>`}</div><div class="safety-note"><strong>AN AUTHORIZATION BOUNDARY, NOT A PENETRATION TEST.</strong><p>Checks are limited to same-domain, public HTTPS GET requests, with pinned DNS resolution, short timeouts and response size limits. They do not brute force, exploit or crawl.</p></div>`;}
 function openDialog(title,html){$('#dialog-title').textContent=title;$('#dialog-body').innerHTML=html;$('#dialog').showModal();}
 function closeDialog(){$('#dialog').close();}
 const field=(label,name,extra='')=>`<label class="field">${label}<input name="${name}" ${extra}></label>`;
 function newCase(){const projects=state.data.projects.filter(p=>p.verifiedAt);openDialog('New repair case',`<p class="dialog-note">Set fixed acceptance criteria. Every future run uses the same test.</p><form data-form="new-case"><label class="field">TEST TARGET<select name="projectId"><option value="sandbox">Built-in controlled sandbox</option>${projects.map(p=>`<option value="${e(p.id)}">${e(p.domain)}</option>`).join('')}</select></label>${field('CASE TITLE','title','required maxlength="100" placeholder="Checkout returns an error"') }<label class="field">WHAT IS BROKEN?<textarea name="description" required maxlength="700" placeholder="Describe the observed failure…"></textarea></label><label class="field">REPRODUCTION STEPS<textarea name="steps" required maxlength="900" placeholder="1. Open route… 2. Run check…"></textarea></label>${field('REQUEST PATH','path','value="/" maxlength="240" placeholder="/checkout"')}${field('EXPECTED HTTP STATUS','expectedStatus','type="number" min="100" max="599" value="200" required')}${field('EXPECTED RESPONSE TEXT (OPTIONAL)','expectedText','maxlength="120" placeholder="CHECKOUT_READY"')}<button class="primary wide" type="submit">Create evidence case ↗</button></form>`);}
 function addDomain(){openDialog('Register a domain',`<p class="dialog-note">Only add a website you control or are authorized to test. A public HTTPS domain is required.</p><form data-form="new-domain">${field('PUBLIC WEBSITE DOMAIN','domain','required placeholder="yourproject.com"') }<button class="primary wide">Issue ownership challenge ↗</button></form>`);}
 function configureReward(id){openDialog('Specify repair reward',`<p class="dialog-note">A Base Sepolia testnet transfer only. No escrow and no real-value assets in this MVP. The transaction is irreversible once signed.</p><form data-form="reward" data-id="${e(id)}">${field('DEVELOPER WALLET (0x…)','to','required pattern="0x[a-fA-F0-9]{40}" placeholder="0x…"')}${field('TEST ETH AMOUNT','amountEth','required placeholder="0.0001" value="0.0001"')}<button class="primary wide">Set testnet reward ↗</button></form>`);}
-async function signIn(){
- const address=await connectWallet();state.wallet=address;
+async function signIn(choice) {
+ const address=await connectWallet(choice);
+ state.wallet=address;
  const issued=await api(`/api/auth/challenge?address=${encodeURIComponent(address)}`);
  const signature=await signInMessage(issued.message);
  const verified=await post('/api/auth/verify',{message:issued.message,signature});
  state.actor=verified.actor;state.selected=null;state.view='overview';
  const operatorStatus=await api('/api/status');$('#admin-link').hidden=!operatorStatus.isAdmin;
- $('#login-screen').hidden=true;$('#login-error').textContent='';
- await refresh();walletRender();flash('Signed in. Your cases and projects are private to this wallet.');
+ if($('#wallet-picker').open)$('#wallet-picker').close();
+ await refresh();walletRender();flash('Wallet connected. Your evidence room is ready.');
+ watchWalletChanges(handleWalletChange);
 }
-function authPrompt(){ $('#login-screen').hidden=false;$('#sign-in-action').focus();}
-function requireAccount(){if(state.actor.role==='guest'){authPrompt();throw new Error('Sign in with your wallet to manage this feature');}}
-async function setWallet(){requireAccount();const next=await connectWallet();if(next.toLowerCase()!==state.actor.wallet?.toLowerCase())throw Error('This wallet is different from your signed-in account. Sign out first.');state.wallet=next;walletRender();}
-function walletRender(){const b=$('#wallet-button');b.innerHTML=state.actor.role==='user'?`${e(trimWallet(state.actor.wallet))} <span>✓</span>`:'Sign in with wallet <span>↗</span>';b.title=state.actor.wallet||'Sign in with a compatible wallet';$('#logout').hidden=state.actor.role!=='user';}
+async function showWalletPicker() {
+ const dialog=$('#wallet-picker');const options=$('#wallet-options');const error=$('#wallet-picker-error');
+ if(!dialog.open)dialog.showModal();error.hidden=true;error.textContent='';
+ options.innerHTML='<p class="wallet-searching">Finding wallets available in this browser...</p>';
+ $('#wallet-picker-close').focus();
+ try{
+  walletChoices=await availableWallets();
+  options.innerHTML=walletChoices.length?walletChoices.map((w,i)=>`<button type="button" class="wallet-option" data-wallet-choice="${i}"><span class="wallet-option-icon">${e((w.name||'W').trim().slice(0,1).toUpperCase())}</span><span><strong>${e(w.name)}</strong><small>Detected in your browser</small></span><span class="wallet-option-arrow">↗</span></button>`).join(''):`<div class="wallet-not-found"><strong>No wallet detected in this browser</strong><p>Install a supported EVM wallet, or open VERRIFT inside your wallet's in-app browser on mobile.</p><div class="wallet-install-links"><a href="https://metamask.io/download/" target="_blank" rel="noopener noreferrer">MetaMask ↗</a><a href="https://www.coinbase.com/wallet" target="_blank" rel="noopener noreferrer">Coinbase Wallet ↗</a><a href="https://rabby.io/" target="_blank" rel="noopener noreferrer">Rabby ↗</a></div></div>`;
+ }catch(err){error.textContent=err.message;error.hidden=false;options.textContent='Unable to discover installed wallets.';}
+}
+function requireAccount(){if(state.actor.role!=='user'){void showWalletPicker();throw new Error('Connect a wallet to manage your repair cases.');}}
+async function setWallet(){
+ requireAccount();const next=await currentWallet(state.actor.wallet);
+ if(!next){await showWalletPicker();throw Error('Choose the same wallet as your connected account.');}
+ state.wallet=next;walletRender();
+}
+function walletRender(){const b=$('#wallet-button');b.innerHTML=state.actor.role==='user'?`${state.wallet?`${e(trimWallet(state.actor.wallet))} <span>✓</span>`:'Reconnect wallet <span>↗</span>'}`:'Connect wallet <span>↗</span>';b.title=state.actor.wallet||'Connect your wallet';$('#logout').hidden=state.actor.role!=='user';}
+async function handleWalletChange(){
+ if(state.actor.role==='user'){
+  const current=await currentWallet(state.actor.wallet).catch(()=>null);
+  if(!current||current.toLowerCase()!==state.actor.wallet.toLowerCase()){
+   await post('/api/logout').catch(()=>{});
+   state.actor={role:'guest',wallet:null};state.wallet=null;state.selected=null;state.data=null;
+   $('#admin-link').hidden=true;renderPublicHome();walletRender();flash('Wallet changed. Reconnect your wallet to continue.','bad');
+  }
+ }
+}
 async function perform(action,id,node){
- if(action==='new-case')return newCase();if(action==='add-domain'){requireAccount();return addDomain();}
- if(action==='demo-case'){
+ if(action==='connect-wallet')return showWalletPicker();if(action==='new-case'){requireAccount();return newCase();}if(action==='add-domain'){requireAccount();return addDomain();}
+ if(action==='quick-start-case'){requireAccount();
   const existing=state.data.cases.find(c=>c.kind==='sandbox');
-  if(existing){state.selected=existing.id;menu('cases');return flash('Opened your live sandbox case');}
-  const result=await post('/api/cases',{kind:'sandbox',title:'Recovery of the sample service',description:'The controlled demonstration service must return an HTTP 200 and a SERVICE_READY result.',steps:'Introduce a fault using the lab control, run the check, restore the service, then rerun the exact same check.',expectedStatus:200,expectedText:'SERVICE_READY'});
-  state.selected=result.case.id;await refresh();menu('cases');flash('Real sample case created. Introduce a fault on Overview to observe a failed test.');return;
+  if(existing){state.selected=existing.id;menu('cases');return flash('Opened your controlled test case');}
+  const result=await post('/api/cases',{kind:'sandbox',title:'Sample service recovery',description:'The controlled test service must return an HTTP 200 and a SERVICE_READY result.',steps:'Introduce a fault using the lab control, run the check, restore the service, then rerun the exact same check.',expectedStatus:200,expectedText:'SERVICE_READY'});
+  state.selected=result.case.id;await refresh();menu('cases');flash('Case created. Introduce a fault on Overview, then record a failing check.');return;
  }
  if(action==='verify-domain'){requireAccount();await post(`/api/projects/${id}/verify`);await refresh();flash('Domain ownership verified');return;}
- if(action==='set-sandbox'){await post('/api/sandbox',{broken:node.dataset.broken==='true'});await refresh();return flash(node.dataset.broken==='true'?'Fault introduced. Run your test now.':'Sample service restored. Rerun the same test.');}
- if(action==='run'){const data=await post(`/api/cases/${id}/run`);await refresh();flash(data.run.passed?'Check passed and evidence saved':'Check failed; evidence captured',data.run.passed?'ok':'bad');return;}
+ if(action==='set-sandbox'){requireAccount();await post('/api/sandbox',{broken:node.dataset.broken==='true'});await refresh();return flash(node.dataset.broken==='true'?'Fault introduced. Run your test now.':'Sample service restored. Rerun the same test.');}
+ if(action==='run'){requireAccount();const data=await post(`/api/cases/${id}/run`);await refresh();flash(data.run.passed?'Check passed and evidence saved':'Check failed; evidence captured',data.run.passed?'ok':'bad');return;}
  if(action==='analyze'){requireAccount();const data=await post(`/api/cases/${id}/analyze`);await refresh();flash(`Claude analysis recorded (${data.analysis.model})`);return;}
  if(action==='anchor'){requireAccount();
   if(!state.wallet)await setWallet();const {digest}=await api(`/api/cases/${id}/proof`);
@@ -147,11 +184,39 @@ document.addEventListener('submit',async event=>{
   if(form.dataset.form==='verify-existing'){await post(`/api/cases/${form.dataset.id}/confirm-payment`,input);closeDialog();await refresh();flash('Base receipt verified');}
  }catch(err){flash(err.message,'bad');}finally{if(b)b.disabled=false;}
 });
-$('#wallet-button').addEventListener('click',async()=>{try{if(state.actor.role==='user')await setWallet();else authPrompt();}catch(err){flash(err.message,'bad');}});
-$('#sign-in-action').addEventListener('click',async event=>{event.currentTarget.disabled=true;try{await signIn();}catch(err){$('#login-error').textContent=err.message;}finally{event.currentTarget.disabled=false;}});
-$('#auth-close').addEventListener('click',()=>$('#login-screen').hidden=true);
-$('#logout').addEventListener('click',async()=>{try{await post('/api/logout');state.actor={role:'guest',wallet:null};state.wallet=null;state.selected=null;$('#admin-link').hidden=true;await refresh();walletRender();flash('Signed out. Public sandbox remains available.');}catch(err){flash(err.message,'bad');}});
+$('#wallet-button').addEventListener('click',async()=>{
+ try {if(state.actor.role==='user'&&state.wallet)flash('Wallet connected: '+trimWallet(state.actor.wallet));else await showWalletPicker();}
+ catch(err){flash(err.message,'bad');}
+});
+$('#wallet-picker-close').addEventListener('click',()=>$('#wallet-picker').close());
+$('#wallet-options').addEventListener('click',async event=>{
+ const item=event.target.closest('[data-wallet-choice]');if(!item)return;
+ const choice=walletChoices[Number(item.dataset.walletChoice)];if(!choice)return;
+ const message=$('#wallet-picker-error');message.hidden=true;message.textContent='';
+ item.disabled=true;item.classList.add('is-connecting');
+ try {
+  if(state.actor.role==='user'){
+   const address=await connectWallet(choice);
+   if(address.toLowerCase()!==state.actor.wallet.toLowerCase())throw Error('Select the wallet linked to this account, or disconnect first.');
+   state.wallet=address;walletRender();$('#wallet-picker').close();flash('Wallet ready.');
+  }else await signIn(choice);
+ }catch(err){message.textContent=err.message;message.hidden=false;}
+ finally{item.disabled=false;item.classList.remove('is-connecting');}
+});
+$('#logout').addEventListener('click',async()=>{
+ try{await post('/api/logout');state.actor={role:'guest',wallet:null};state.wallet=null;state.selected=null;state.data=null;$('#admin-link').hidden=true;renderPublicHome();walletRender();flash('Disconnected. Your evidence is saved to your account.');}
+ catch(err){flash(err.message,'bad');}
+});
 $('#dialog-close').addEventListener('click',closeDialog);
 $('#dialog').addEventListener('click',event=>{if(event.target===$('#dialog'))closeDialog();});
-async function boot(){try{const status=await api('/api/status');state.aiEnabled=status.aiEnabled;state.actor=status.actor||{role:'guest',wallet:null};state.wallet=await currentWallet();walletRender();$('#admin-link').hidden=!(status.isAdmin);await refresh();watchWalletChanges(async()=>{if(state.actor.role==='user'){const current=await currentWallet().catch(()=>null);if(!current||current.toLowerCase()!==state.actor.wallet.toLowerCase()){await post('/api/logout').catch(()=>{});state.actor={role:'guest',wallet:null};state.selected=null;await refresh();walletRender();flash('Wallet changed. Sign in again to continue.','bad');}}});}catch(err){$('#content').innerHTML=`<div class="fatal">Unable to load VERRIFT: ${e(err.message)}</div>`;}}
+async function boot(){
+ renderPublicHome();walletRender();
+ try{
+  const status=await api('/api/status');state.aiEnabled=status.aiEnabled;state.actor=status.actor||{role:'guest',wallet:null};
+  state.wallet=state.actor.role==='user'?await currentWallet(state.actor.wallet):null;
+  walletRender();$('#admin-link').hidden=!status.isAdmin;
+  if(state.actor.role==='user')await refresh();else renderPublicHome();
+  if(state.actor.role==='user')watchWalletChanges(handleWalletChange);
+ }catch(err){renderPublicHome(err.message);}
+}
 boot();

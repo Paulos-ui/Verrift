@@ -1,3 +1,9 @@
+# VERRIFT visual identity and UI standards
+
+**Current selected direction (V6): Pine & Tide.** Pure white canvas (`#ffffff`), deep pine navigation (`#153f35`), ocean-blue accents (`#3177a5`) and quiet mint (`#a9eccc`). Typography pairs a Georgia editorial display with restrained sans/monospace operational labels. Orange and copper accents have been removed. The first `/app` screen welcomes visitors and offers a wallet picker. Private workspace metrics are derived from API data after successful wallet authentication, not from sample dashboard numbers.
+
+The remaining notes below preserve the historical V5 exploration for reference, not as active palette instructions.
+
 # VERRIFT | Public Identity and Motion Notes
 
 ## Design territories considered

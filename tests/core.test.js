@@ -61,9 +61,9 @@ test('response checks represent observed evidence, not simulated pass',()=>{
  assert.equal(checkResponse(base,200,'SERVICE_READY').passed,false);
  assert.equal(checkResponse({...base,status:200,body:'SERVICE_READY'},200,'SERVICE_READY').passed,true);
 });
-test('guest access, wallet sign-in, and cross-origin protection',async()=>{
+test('public entry, wallet authentication, protected workspace, and cross-origin protection',async()=>{
  const f=await fixture();try{
- assert.equal((await f.call('/api/data')).status,200);
+ assert.equal((await f.call('/api/data')).status,401);
  assert.equal((await f.call('/api/login','POST',{password:'legacy'})).status,404);
  const noSig=await f.call('/api/auth/verify','POST',{message:'not a challenge',signature:'0x'+'1'.repeat(130)});
  assert.equal(noSig.status,401);
@@ -71,7 +71,7 @@ test('guest access, wallet sign-in, and cross-origin protection',async()=>{
  const attack=await f.call('/api/sandbox','POST',{broken:true},{origin:'https://attacker.example'});
  assert.equal(attack.status,403);
  assert.equal((await f.call('/api/logout','POST')).status,200);
- assert.equal((await f.call('/api/data')).status,200);
+ assert.equal((await f.call('/api/data')).status,401);
  assert.equal((await f.call('/api/status')).result.actor.role,'guest');
  }finally{await f.close();}
 });
@@ -185,7 +185,7 @@ test('public report is readable without an admin session only with its exact tok
  const f=await fixture();try{
  await f.login();const c=(await f.call('/api/cases','POST',{kind:'sandbox',title:'Published evidence',description:'Read-only report',steps:'Read tests',expectedStatus:200})).result.case;
  const s=(await f.call(`/api/cases/${c.id}/share`,'POST')).result;const raw=s.url;
- await f.call('/api/logout','POST');assert.equal((await f.call('/api/data')).status,200);assert.equal((await f.call('/api/data')).result.cases.length,0);
+ await f.call('/api/logout','POST');assert.equal((await f.call('/api/data')).status,401);
  const publicResult=await f.call(raw);assert.equal(publicResult.status,200);assert.equal(publicResult.result.case.title,'Published evidence');
  assert.equal((await f.call(`/api/public/${c.id}?token=invalid`)).status,404);
  assert.equal((await fetch(f.url+`/report/${c.id}?token=invalid`)).status,200); // static report is public; its API enforces token
@@ -205,18 +205,23 @@ test('two signed-in wallets cannot see or mutate each others projects and cases'
  assert.equal((await f.call(`/api/cases/${c.id}/run`,'POST',{})).status,200);
  }finally{await f.close();}
 });
-test('guest sandboxes are independent, with no access to account-only features',async()=>{
+test('anonymous visitors cannot create cases, change test state, or read private records',async()=>{
  const f=await fixture();try{
- const guestB=f.client();
- await f.call('/api/status');await guestB.call('/api/status');
- await f.call('/api/sandbox','POST',{broken:true});
- assert.equal((await f.call('/api/sandbox/widget')).status,503);
- assert.equal((await guestB.call('/api/sandbox/widget')).status,200);
- assert.equal((await f.call('/api/projects','POST',{domain:'otherdomain.example.com'})).status,401);
- const c=(await f.call('/api/cases','POST',{kind:'sandbox',title:'A demo',description:'Test isolation',steps:'Check state',expectedStatus:200})).result.case;
- assert.equal((await f.call(`/api/cases/${c.id}/run`,'POST',{})).status,200);
- assert.equal((await guestB.call(`/api/cases/${c.id}/run`,'POST',{})).status,404);
- assert.equal((await f.call(`/api/cases/${c.id}/analyze`,'POST',{})).status,401);
+  const visitorB=f.client();
+  assert.equal((await f.call('/api/status')).status,200);
+  assert.equal((await visitorB.call('/api/status')).status,200);
+  assert.equal((await f.call('/api/data')).status,401);
+  assert.equal((await f.call('/api/sandbox','POST',{broken:true})).status,401);
+  assert.equal((await f.call('/api/sandbox/widget')).status,200);
+  assert.equal((await f.call('/api/projects','POST',{domain:'otherdomain.example.com'})).status,401);
+  const a=await f.call('/api/cases','POST',{kind:'sandbox',title:'Anonymous attempt',description:'Not allowed',steps:'Test state',expectedStatus:200});
+  assert.equal(a.status,401);
+  assert.equal((await visitorB.call('/api/data')).status,401);
+  await f.login();
+  assert.equal((await f.call('/api/data')).status,200);
+  assert.equal((await f.call('/api/sandbox','POST',{broken:true})).status,200);
+  assert.equal((await f.call('/api/sandbox/widget')).status,503);
+  assert.equal((await visitorB.call('/api/sandbox/widget')).status,200);
  }finally{await f.close();}
 });
 test('unsigned or mismatched wallet cannot record another wallet payment',async()=>{

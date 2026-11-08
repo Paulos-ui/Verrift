@@ -4,7 +4,7 @@
 - [x] Reduced motion and interactive storyboard with clear illustrative label
 - [x] Static desktop/tablet/mobile screenshots, no horizontal overflow in browser harness
 - [ ] Verify new landing page and full user flow on live Vercel domain
-- [x] Public entry, guest sandbox and private authenticated user separation
+- [x] Public entry, wallet-first home and private authenticated user separation
 - [x] Admin password removed; separate operator route added
 - [x] EIP-4361 challenge and Supabase Web3 exchange integration implemented
 - [x] Per-user access controls for projects, cases, exports and rewards
