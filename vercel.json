@@ -30,6 +30,10 @@
       "destination": "/admin.html"
     },
     {
+      "source": "/verify",
+      "destination": "/verify.html"
+    },
+    {
       "source": "/about",
       "destination": "/docs.html"
     },

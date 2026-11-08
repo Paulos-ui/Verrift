@@ -56,7 +56,8 @@ test('Public landing lives at root and the full user workspace lives at /app', a
   const workspace=await readFile('public/workspace.html','utf8');
   assert.match(landing,/id="intro-title"/);
   assert.match(landing,/href="\/app"/);
-  assert.match(landing,/INTERACTIVE PROCESS ILLUSTRATION/);
+  assert.match(landing,/id="inspector"/);
+  assert.match(landing,/Know the allowance/);
   assert.match(workspace,/id="wallet-button"/);
   assert.match(workspace,/id="content"/);
   assert.doesNotMatch(landing,/src="\/app\.js"/);
@@ -73,7 +74,8 @@ test('Landing motion is purposeful and respects reduced-motion settings',async()
   assert.match(js,/requestAnimationFrame/);
   assert.match(js,/aria-pressed/);
   assert.ok(html.includes('Skip to content'));
-  assert.ok(html.includes('NOT A LIVE WEBSITE SCAN'));
+  assert.ok(html.includes('BASE MAINNET / REAL READS'));
+  assert.ok(html.includes('No imaginary'));
   assert.ok(html.includes('Base Sepolia'));
   assert.doesNotMatch(html+css+js,/\u2014/);
 });

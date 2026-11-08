@@ -108,3 +108,20 @@ export function watchWalletChanges(fn) {
   provider.on('chainChanged', fn);
  }
 }
+
+// Base Mainnet remediation. Never switches chains at sign-in or for read-only reports.
+export async function sendERC20Revoke({owner,token,spender}) {
+ if (!provider) throw Error('Select the wallet linked to your VERRIFT account.');
+ if (![owner,token,spender].every(a => /^0x[0-9a-f]{40}$/i.test(a))) throw Error('Invalid token, spender or wallet address.');
+ const accounts=await provider.request({method:'eth_accounts'});
+ if (!accounts.some(a=>a.toLowerCase()===owner.toLowerCase()))throw Error('Wallet account no longer matches your authenticated profile.');
+ let network=String(await provider.request({method:'eth_chainId'})).toLowerCase();
+ if(network!=='0x2105'){
+  try{await provider.request({method:'wallet_switchEthereumChain',params:[{chainId:'0x2105'}]});}
+  catch(err){if(err.code!==4902)throw err;await provider.request({method:'wallet_addEthereumChain',params:[{chainId:'0x2105',chainName:'Base',nativeCurrency:{name:'Ether',symbol:'ETH',decimals:18},rpcUrls:['https://mainnet.base.org'],blockExplorerUrls:['https://basescan.org']}]});}
+  network=String(await provider.request({method:'eth_chainId'})).toLowerCase();
+  if(network!=='0x2105')throw Error('Switch to Base Mainnet before authorizing revocation.');
+ }
+ const data='0x095ea7b3'+spender.slice(2).toLowerCase().padStart(64,'0')+'0'.repeat(64);
+ return provider.request({method:'eth_sendTransaction',params:[{from:owner,to:token,value:'0x0',data}]});
+}

@@ -38,7 +38,7 @@ function selectPhase(index){
   $('#chart-path').setAttribute('d',phase.chart);
 }
 $$('.step-button').forEach(button=>button.addEventListener('click',()=>selectPhase(Number(button.dataset.phase))));
-selectPhase(0);
+if(document.querySelector('#case-display'))selectPhase(0);
 if(stage&&!reduce.matches&&matchMedia('(pointer:fine)').matches){
   let frame=0;
   stage.addEventListener('pointermove',event=>{
