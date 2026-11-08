@@ -1,3 +1,7 @@
+# V7 quick update
+
+This release adds wallet-first Base Mainnet analytics and optional Blockscout indexed history. See `V7_RELEASE.md` for the actual user journey and the Vercel environment variables. No new Supabase tables are needed. Wallet proof anchoring remains an optional Base Sepolia action, not a condition of sign-in.
+
 # VERRIFT | GitHub, Supabase and Vercel deployment
 
 > **Updated deployment layout:** For fixes to the November 7 Vercel `FUNCTION_INVOCATION_FAILED`, follow `VERCEL_HOTFIX.md` first. The old root-level `server.js` must be removed from already-extracted repositories, because unzip does not remove old files. The local server now lives at `scripts/dev-server.js`; production uses `api/index.js` and `public/`.

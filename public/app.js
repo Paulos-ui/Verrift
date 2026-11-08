@@ -1,6 +1,6 @@
 import {availableWallets,connectWallet,currentWallet,walletBalance,sendEth,anchorEvidence,signInMessage,watchWalletChanges,EXPLORER} from './wallet.js';
 const $=s=>document.querySelector(s);
-const state={view:'overview',data:null,selected:null,wallet:null,actor:{role:'guest',wallet:null},aiEnabled:false,pending:null,focus:null};
+const state={view:'overview',data:null,selected:null,wallet:null,actor:{role:'guest',wallet:null},aiEnabled:false,pending:null,focus:null,insights:null,insightsAt:0,insightsError:null,passport:null,pendingPassport:null};
 let walletChoices=[]; 
 const escapeHTML=s=>String(s??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#39;');
 const e=escapeHTML;
@@ -14,18 +14,54 @@ async function api(url,options={}){
 }
 const post=(url,value={})=>api(url,{method:'POST',body:JSON.stringify(value)});
 const statusTag=(name)=>{const good=name==='verified'||name==='passing';return `<span class="status-tag ${good?'good':name==='failing'?'bad':'neutral'}"><span aria-hidden="true">●</span> ${e(name)}</span>`;};
-async function refresh(){if(state.actor.role!=='user'){state.data=null;renderPublicHome();return;}const result=await api('/api/data');state.data=result;render();}
+async function refresh(){
+ if(state.actor.role!=='user'){state.data=null;renderPublicHome();return;}
+ const shouldRead=!state.insights||Date.now()-state.insightsAt>120000;
+ const [data,insights,passport]=await Promise.allSettled([api('/api/data'),shouldRead?api('/api/wallet/insights'):Promise.resolve({insights:state.insights}),api('/api/wallet/passport')]);
+ if(data.status!=='fulfilled')throw data.reason;
+ state.data=data.value;
+ if(insights.status==='fulfilled'){state.insights=insights.value.insights;state.insightsAt=Date.now();state.insightsError=null;}
+ else state.insightsError=insights.reason.message;
+ if(passport.status==='fulfilled')state.passport=passport.value.passport;
+ render();
+}
 function menu(view){if(state.actor.role!=='user'){renderPublicHome();showWalletPicker();return;}state.view=view;document.querySelectorAll('[data-view]').forEach(button=>{button.classList.toggle('active',button.dataset.view===view)});$('#crumb-view').textContent=view.toUpperCase();render();}
-function render(){if(!state.data)return;$('#crumb-view').textContent=state.view.toUpperCase();$('#case-counter').textContent=state.data.cases.length;const content=$('#content');if(state.view==='overview')content.innerHTML=overview();if(state.view==='cases')content.innerHTML=casesPage();if(state.view==='domains')content.innerHTML=domainsPage();}
+function render(){if(!state.data)return;$('#crumb-view').textContent=state.view.toUpperCase();$('#case-counter').textContent=state.data.cases.length;const content=$('#content');if(state.view==='overview')content.innerHTML=walletPassportView();if(state.view==='cases')content.innerHTML=casesPage();if(state.view==='domains')content.innerHTML=domainsPage();}
 function renderPublicHome(error='') {
  const content=$('#content');
  $('#case-counter').textContent='';
  $('#crumb-view').textContent='HOME';
  content.innerHTML=`<div class="welcome-gateway"><div class="gateway-topline"><span>WELCOME TO VERRIFT</span><span>01 / 04 · YOUR WORKSPACE</span></div>
-  <div class="gateway-grid"><div class="gateway-copy"><p class="eyebrow">EVIDENCE-DRIVEN SOFTWARE REPAIR</p><h1>Your work.<br><em>Your proof.</em></h1><p>VERRIFT helps teams document what broke, run a repeatable verification check, and preserve the outcome. Connect a wallet to begin your own repair record.</p><button class="gateway-connect" type="button" data-action="connect-wallet">Connect wallet <span>↗</span></button><div class="gateway-footnote"><span class="gateway-signal"></span> NO PASSWORD REQUIRED · SIGNATURE-BASED ACCESS</div></div>
+  <div class="gateway-grid"><div class="gateway-copy"><p class="eyebrow">EVIDENCE-DRIVEN SOFTWARE REPAIR</p><h1>Your wallet.<br><em>Your story.</em></h1><p>VERRIFT helps teams document what broke, run a repeatable verification check, and preserve the outcome. Connect a wallet to discover your Base activity and create a shareable proof. Repair verification is an optional tool for builders.</p><button class="gateway-connect" type="button" data-action="connect-wallet">Connect wallet <span>↗</span></button><div class="gateway-footnote"><span class="gateway-signal"></span> NO PASSWORD REQUIRED · SIGNATURE-BASED ACCESS</div></div>
    <div class="gateway-visual" aria-label="How proof-of-fix works"><div class="gateway-visual-top">THE EVIDENCE FLOW <span>V / 001</span></div><div class="gateway-visual-steps"><div><span>01</span><strong>CAPTURE</strong><small>Record the failed check</small></div><div class="gateway-path">↓</div><div><span>02</span><strong>VERIFY</strong><small>Rerun unchanged criteria</small></div><div class="gateway-path">↓</div><div><span>03</span><strong>PROVE</strong><small>Preserve a Base receipt</small></div></div><div class="gateway-visual-bottom">BUILT ON BASE SEPOLIA · TESTNET</div></div></div>
   <div class="gateway-bottom"><div><span class="gateway-number">01 /</span><strong>Private evidence records</strong><p>Your cases are isolated to your authenticated wallet.</p></div><div><span class="gateway-number">02 /</span><strong>Authorized website checks</strong><p>Ownership verification keeps external testing in scope.</p></div><div><span class="gateway-number">03 /</span><strong>Claude + Base</strong><p>AI analysis and confirmed onchain proof are available after connection.</p></div></div>
   ${error?`<p class="gateway-service-error" role="alert">Workspace service unavailable: ${e(error)}. You can still explore the public website and documentation.</p>`:''}
+ </div>`;
+}
+function walletPassportView(){
+ const a=state.actor.wallet||'';const x=state.insights;const verified=Boolean(state.passport?.confirmedAt);
+ const money=n=>n==null?'Not available':`${Number(n).toLocaleString(undefined,{maximumFractionDigits:5})} ETH`;
+ const history=x?.history;const cp=history?.counterparties||[];
+ const activity=history?.recent||[];
+ const stats=[
+  {num:x?money(x.balanceEth):'...',title:'BASE ETH BALANCE',detail:'Mainnet · live RPC value'},
+  {num:x?Number(x.outgoingNonce).toLocaleString():'...',title:'TRANSACTIONS SENT',detail:'Account nonce, not total interactions'},
+  {num:history?money(history.sentEth):'Unavailable',title:'ETH SENT (SAMPLE)',detail:history?'Recent indexed transactions':'Configure a history indexer'},
+  {num:history?money(history.gasEth):'Unavailable',title:'GAS (SAMPLE)',detail:'Recent native outgoing transactions'}
+ ];
+ const footnote=x?.limitNote||state.insightsError||'Reading public Base Mainnet data. Wallet analysis cannot move your funds.';
+ return `<div class="passport-page">
+  <div class="passport-heading"><div><p class="eyebrow">VERRIFT / BASE WALLET INTELLIGENCE</p><h1>Your Base story.<br><em>Made verifiable.</em></h1><p>One connected wallet. Real Base data. A receipt you can choose to carry onchain and share.</p></div><button class="passport-refresh" data-action="wallet-refresh">↻ Refresh activity</button></div>
+  <section class="passport-hero" aria-label="Wallet passport">
+   <div class="passport-hero-copy"><div class="passport-meta">VERRIFT / WALLET PASSPORT <span>BASE · 8453</span></div><div class="passport-symbol">V<span>/</span></div><h2>Congratulations.<br><em>Your wallet is connected.</em></h2><p>Ownership was checked through your signed login. Explore public Base activity without granting spending permissions.</p><div class="passport-address"><span>YOUR WALLET</span><strong>${e(trimWallet(a))}</strong><button data-action="copy-wallet" type="button">Copy address ↗</button></div></div>
+   <div class="passport-hero-right"><div class="passport-seal"><span>✓</span><strong>OWNERSHIP<br>VERIFIED</strong><small>By wallet signature</small></div><div class="passport-hero-actions"><button data-action="passport-generate" class="passport-primary">${state.passport?'View wallet receipt':'Generate my receipt'} <span>↗</span></button><button data-action="share-wallet-x" class="passport-secondary">Share to X <span>↗</span></button></div><small class="passport-chain-note">Optional Base Sepolia proof uses testnet gas and requires wallet approval.</small></div>
+  </section>
+  <section class="passport-metrics" aria-label="Wallet activity metrics">${stats.map((v,i)=>`<div class="passport-metric"><span class="passport-metric-index">0${i+1} / ${v.title}</span><strong>${e(v.num)}</strong><small>${e(v.detail)}</small></div>`).join('')}</section>
+  <div class="passport-info-note"><span>DATA PROVENANCE</span><p>${e(footnote)}</p>${x?`<a href="https://basescan.org/address/${e(a)}" target="_blank" rel="noopener noreferrer">Verify on BaseScan ↗</a>`:''}</div>
+  <div class="passport-lower"><section class="passport-panel"><div class="passport-panel-header"><div><span>01 / MOVEMENT</span><h2>Recent activity</h2></div><span class="passport-count">${activity.length} DISPLAYED</span></div>${activity.length?`<div class="passport-history">${activity.map(t=>`<a href="https://basescan.org/tx/${e(t.hash)}" target="_blank" rel="noopener noreferrer" class="passport-tx"><span class="passport-dir ${t.direction==='out'?'out':'in'}">${t.direction==='out'?'↗':'↙'}</span><div><strong>${t.direction==='out'?'Sent':'Received'} ${e(money(t.valueEth))}</strong><small>${e(t.counterparty?trimWallet(t.counterparty):'Contract / creation')} · ${e(t.timestamp?.slice(0,10)||'Onchain')}</small></div><span>View ↗</span></a>`).join('')}</div>`:`<div class="passport-empty"><strong>No indexed transfers shown.</strong><p>Live balance and transaction count are available now. Add a Blockscout API key for recent counterparties and native transfer history.</p></div>`}</section>
+  <section class="passport-panel"><div class="passport-panel-header"><div><span>02 / CONNECTIONS</span><h2>Repeated counterparties</h2></div></div>${cp.length?`<div class="passport-counterparties">${cp.map((item,i)=>`<a href="https://basescan.org/address/${e(item.address)}" target="_blank" rel="noopener noreferrer"><b>0${i+1}</b><span>${e(trimWallet(item.address))}</span><strong>${item.interactions} touches ↗</strong></a>`).join('')}</div>`:`<div class="passport-empty"><strong>No counterparties to rank yet.</strong><p>We'll show wallet addresses you've interacted with repeatedly once indexed history is available.</p></div>`}
+  <div class="passport-proof-status"><span>03 / YOUR RECEIPT</span><h3>${verified?'Anchored on Base Sepolia':state.passport?'Receipt generated':'Make your Base footprint portable.'}</h3><p>${verified?'This proof is confirmed by an onchain transaction.':state.passport?'Your snapshot exists. Anchoring is optional and requires a testnet transaction.':'Create a fingerprint of this wallet snapshot, then choose whether to record it on testnet.'}</p><button class="passport-inline-btn" data-action="passport-generate">${state.passport?'Open receipt':'Create receipt'} ↗</button></div></section></div>
+  <section class="passport-dev"><div><span>ADVANCED / FOR BUILDERS</span><h2>Need to verify an actual software repair?</h2><p>Our original evidence lab is still here for developers. It is optional, not a condition of using VERRIFT.</p></div><button data-view="cases">Open repair lab ↗</button></section>
  </div>`;
 }
 const lens=()=>{
@@ -103,7 +139,8 @@ async function signIn(choice) {
  state.actor=verified.actor;state.selected=null;state.view='overview';
  const operatorStatus=await api('/api/status');$('#admin-link').hidden=!operatorStatus.isAdmin;
  if($('#wallet-picker').open)$('#wallet-picker').close();
- await refresh();walletRender();flash('Wallet connected. Your evidence room is ready.');
+ await refresh();walletRender();flash('Wallet verified. Welcome to VERRIFT!');
+  openDialog('Your Base identity is ready',`<div class="passport-congrats"><span class="passport-congrats-icon">✓</span><h3>Congratulations. Your wallet is verified.</h3><p>VERRIFT checked ownership by signature. Your Base activity is now on your dashboard, and you can choose to generate a receipt or share the moment with X.</p><div class="passport-congrats-actions"><button class="primary" type="button" data-action="open-passport">Explore my wallet ↗</button><button type="button" class="small-button" data-action="share-wallet-x">Share to X ↗</button></div></div>`);
  watchWalletChanges(handleWalletChange);
 }
 async function showWalletPicker() {
@@ -134,6 +171,48 @@ async function handleWalletChange(){
  }
 }
 async function perform(action,id,node){
+ if(action==='open-passport'){closeDialog();menu('overview');return;}
+ if(action==='wallet-refresh'){state.insightsAt=0;await refresh();flash(state.insightsError||'Latest Base data loaded',state.insightsError?'bad':'ok');return;}
+ if(action==='copy-wallet'){await navigator.clipboard.writeText(state.actor.wallet);flash('Wallet address copied');return;}
+ if(action==='share-wallet-x'){
+  const proof=state.passport?.confirmedAt?` I anchored my VERRIFT receipt on Base Sepolia: ${state.passport.explorer}`:'';
+  const text=`My Base wallet is verified on VERRIFT. Exploring my onchain activity with a receipt I can independently check.${proof}\n\nExplore VERRIFT: https://verrift.vercel.app/`;
+  window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(text),'_blank','noopener,noreferrer');return;
+ }
+ if(action==='passport-generate'){
+  requireAccount();if(!state.passport)state.passport=(await post('/api/wallet/passport')).passport;
+  const p=state.passport;const verified=Boolean(p.confirmedAt);
+  openDialog('VERRIFT Wallet Passport',`<div class="passport-receipt"><div class="passport-receipt-brand">V / VERRIFT <span>BASE WALLET PASSPORT</span></div><h3>${verified?'Proof confirmed.':'Snapshot created.'}</h3><p>Your wallet was authenticated by signature. The recorded Base Mainnet snapshot is hashed so that an optional Base Sepolia transaction can reference it without publishing your balances.</p><div class="passport-receipt-meta"><span>WALLET</span><b>${e(trimWallet(p.wallet))}</b><span>ISSUED</span><b>${e(p.createdAt.slice(0,10))}</b><span>FINGERPRINT</span><code>${e(p.digest.slice(0,19))}…</code><span>CHAIN PROOF</span><b>${verified?'Confirmed on Base Sepolia':'Not anchored'}</b></div>${verified?`<a target="_blank" rel="noopener noreferrer" href="${e(p.explorer)}">View confirmed proof ↗</a>`:`<button type="button" class="primary wide" data-action="passport-anchor">Anchor on Base Sepolia ↗</button><button type="button" class="small-button" data-action="passport-verify-existing">Already sent a transaction? Verify its hash ↗</button>`}<div class="passport-receipt-actions"><button data-action="download-wallet-card" type="button">Download branded card</button><button data-action="download-wallet-json" type="button">Export proof JSON</button><button data-action="share-wallet-x" type="button">Share to X ↗</button></div><p class="passport-receipt-warning">This proves wallet control and a dated snapshot, not financial identity or safety. Anchoring is optional and costs testnet gas.</p></div>`);return;
+ }
+ if(action==='passport-anchor'){
+  requireAccount();if(!state.passport||state.passport.confirmedAt)throw Error('Generate an unanchored receipt first');
+  if(!state.wallet)await setWallet();
+  if(!confirm('Anchor your wallet snapshot fingerprint to Base Sepolia? A zero-value transaction to yourself uses testnet gas. No financial details are published.'))return;
+  const tx=await anchorEvidence({from:state.wallet,digest:state.passport.digest});state.pendingPassport=tx;
+  openDialog('Wallet proof submitted',`<p class="dialog-note">Your zero-value testnet transaction has been submitted. Confirm it after it is mined. Do not submit another proof while waiting.</p><div class="tx-hash">${e(tx)}</div><a class="small-link" target="_blank" rel="noopener noreferrer" href="${EXPLORER+e(tx)}">See transaction on Base Sepolia ↗</a><button class="primary wide" type="button" data-action="passport-confirm">Confirm this proof ↗</button>`);return;
+ }
+ if(action==='passport-verify-existing'){
+  requireAccount();if(!state.passport||state.passport.confirmedAt)throw Error('No unconfirmed wallet passport exists');
+  openDialog('Verify a previous wallet proof',`<p class="dialog-note">Paste the Base Sepolia transaction hash from your wallet. VERRIFT verifies that it is your own zero-value self-transaction containing the exact passport digest.</p><form data-form="passport-verify-existing"><label for="passport-proof-hash">TRANSACTION HASH</label><input id="passport-proof-hash" name="hash" placeholder="0x..." required pattern="0x[0-9a-fA-F]{64}"><button class="primary wide" type="submit">Verify Base receipt ↗</button></form>`);return;
+ }
+ if(action==='passport-confirm'){
+  requireAccount();if(!state.pendingPassport)throw Error('No pending wallet proof this session. Find the transaction hash in your wallet and try again.');
+  const p=await post('/api/wallet/confirm',{hash:state.pendingPassport});state.passport=p.passport;state.pendingPassport=null;closeDialog();await refresh();flash('Your wallet proof is confirmed on Base Sepolia!');return;
+ }
+ if(action==='download-wallet-json'){
+  if(!state.passport)throw Error('Create a receipt first');
+  const p=state.passport;const receipt={protocol:p.protocol,wallet:p.wallet,chainId:p.chainId,balanceEth:p.balanceEth,outgoingNonce:p.outgoingNonce,inspectedAt:p.inspectedAt,digest:p.digest,createdAt:p.createdAt,anchor:p.txHash?{network:'Base Sepolia',transaction:p.txHash,blockNumber:p.blockNumber,explorer:p.explorer}:null};
+  const blob=new Blob([JSON.stringify(receipt,null,2)],{type:'application/json'});const a=document.createElement('a');const url=URL.createObjectURL(blob);a.href=url;a.download='verrift-wallet-passport.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),600);flash('Wallet receipt exported');return;
+ }
+ if(action==='download-wallet-card'){
+  const p=state.passport;if(!p)throw Error('Create a receipt first');
+  const canvas=document.createElement('canvas');canvas.width=1200;canvas.height=630;
+  const c=canvas.getContext('2d');c.fillStyle='#133d35';c.fillRect(0,0,1200,630);c.fillStyle='#b6efcf';c.fillRect(80,86,64,64);
+  c.fillStyle='#143d34';c.font='bold 52px Georgia';c.fillText('V',95,135);c.fillStyle='#fff';c.font='bold 34px Arial';c.fillText('VERRIFT  /  BASE PASSPORT',176,128);
+  c.font='68px Georgia';c.fillText('Your wallet. Your proof.',80,300);c.fillStyle='#c1e4d1';c.font='29px Arial';c.fillText(`Wallet: ${trimWallet(p.wallet)}`,80,390);c.fillText(p.confirmedAt?'BASE SEPOLIA / ANCHORED':'SIGNED WALLET / SNAPSHOT ISSUED',80,448);
+  c.font='22px monospace';c.fillText(p.digest.slice(0,42)+'…',80,533);
+  const a=document.createElement('a');a.download='verrift-wallet-passport.png';a.href=canvas.toDataURL('image/png');a.click();flash('Branded wallet passport downloaded');return;
+ }
  if(action==='connect-wallet')return showWalletPicker();if(action==='new-case'){requireAccount();return newCase();}if(action==='add-domain'){requireAccount();return addDomain();}
  if(action==='quick-start-case'){requireAccount();
   const existing=state.data.cases.find(c=>c.kind==='sandbox');
@@ -177,6 +256,9 @@ document.addEventListener('submit',async event=>{
  const form=event.target.closest('[data-form]');if(!form)return;event.preventDefault();const b=form.querySelector('button[type=submit],button:not([type])');if(b)b.disabled=true;
  const input=Object.fromEntries(new FormData(form));
  try{
+  if(form.dataset.form==='passport-verify-existing'){
+   const result=await post('/api/wallet/confirm',{hash:input.hash});state.passport=result.passport;state.pendingPassport=null;closeDialog();await refresh();flash('Your Base proof was verified!');
+  }
   if(form.dataset.form==='new-case'){const result=await post('/api/cases',{kind:input.projectId==='sandbox'?'sandbox':'external',...input});state.selected=result.case.id;closeDialog();await refresh();menu('cases');flash('Case opened with locked test criteria');}
   if(form.dataset.form==='new-domain'){await post('/api/projects',input);closeDialog();await refresh();menu('domains');flash('Ownership challenge issued');}
   if(form.dataset.form==='reward'){await post(`/api/cases/${form.dataset.id}/reward`,input);closeDialog();await refresh();flash('Testnet reward configured');}

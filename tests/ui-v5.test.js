@@ -35,7 +35,7 @@ test('Visitor navigation and browser title remain correctly branded',async()=>{
  assert.match(landing,/href="\/app"/);
  assert.match(workspace,/href="\/" aria-label="VERRIFT home"/);
  assert.match(workspace,/<title>VERRIFT \| The Proof-of-Fix Network<\/title>/);
- assert.match(workspace,/class="nav-mobile">Domains<\/span>/);
+ assert.match(workspace,/class="nav-mobile">Sites<\/span>/);
 });
 
 test('Customer-facing VERRIFT source has no em dashes',async()=>{

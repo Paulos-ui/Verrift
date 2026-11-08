@@ -258,3 +258,34 @@ test('serverless rewrite adapter preserves declared API routes',async()=>{
   if(prev2===undefined)delete process.env.SESSION_SECRET;else process.env.SESSION_SECRET=prev2;
  }
 });
+
+test('wallet passport routes reject guests and isolate wallet records',async()=>{
+ const inspector=async address=>({wallet:address.toLowerCase(),chainId:8453,balanceEth:'0.200000',outgoingNonce:4,inspectedAt:'2026-11-08T00:00:00Z',indexed:false,limitNote:'RPC only',history:null});
+ const f=await fixture({walletInspector:inspector,anchorVerifier:async ({hash,from,digest})=>({hash,from,digest,explorer:'https://sepolia.basescan.org/tx/'+hash,blockNumber:1789})});
+ try{
+   assert.equal((await f.call('/api/wallet/insights')).status,401);
+   assert.equal((await f.call('/api/wallet/passport')).status,401);
+   assert.equal((await f.call('/api/wallet/passport','POST',{})).status,401);
+   const a=f.client(),b=f.client();
+   await a.login(walletF);await b.login(wallet2);
+   assert.equal((await a.call('/api/wallet/insights')).result.insights.balanceEth,'0.200000');
+   const p=await a.call('/api/wallet/passport','POST',{});assert.equal(p.status,200);assert.match(p.result.passport.digest,/^0x[a-f0-9]{64}$/);
+   assert.equal(p.result.passport.confirmedAt,null);
+   assert.equal((await b.call('/api/wallet/passport')).result.passport,null);
+   assert.equal((await b.call('/api/wallet/confirm','POST',{hash:'0x'+'1'.repeat(64)})).status,409);
+   const proof=await a.call('/api/wallet/confirm','POST',{hash:'0x'+'a'.repeat(64)});
+   assert.equal(proof.status,200);assert.ok(proof.result.passport.confirmedAt);
+   assert.equal(proof.result.passport.blockNumber,1789);
+   assert.equal((await a.call('/api/wallet/confirm','POST',{hash:'0x'+'b'.repeat(64)})).status,409);
+   assert.equal((await b.call('/api/wallet/passport')).result.passport,null);
+ }finally{await f.close();}
+});
+test('wallet proof never trusts browser-supplied snapshot data',async()=>{
+ let calls=0;
+ const f=await fixture({walletInspector:async wallet=>{calls++;return {wallet,balanceEth:'0.010000',outgoingNonce:7,inspectedAt:'2026-11-08T00:00:00Z'};}});
+ try{await f.login(walletF);const forged={wallet:wallet2,balanceEth:'1000000000',outgoingNonce:999999};
+  const receipt=(await f.call('/api/wallet/passport','POST',forged)).result.passport;
+  assert.equal(receipt.wallet,walletF);assert.equal(receipt.balanceEth,'0.010000');assert.equal(receipt.outgoingNonce,7);
+  const same=(await f.call('/api/wallet/passport','POST',forged)).result.passport;assert.equal(same.digest,receipt.digest);assert.equal(calls,1);
+ }finally{await f.close();}
+});

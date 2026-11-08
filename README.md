@@ -1,3 +1,24 @@
+## Wallet Passport (V7 user-first flow)
+
+The main workspace now opens with Base Mainnet wallet activity rather than requiring
+visitors to create a developer repair case. After Supabase wallet authentication,
+the app reads the connected wallet's ETH balance and outgoing transaction nonce
+from Base Mainnet RPC (chain 8453). With `BLOCKSCOUT_API_KEY` configured, it
+also reads a bounded page of indexed transactions, sample ETH/gas spending,
+repeated counterparties and recent activity. **These are recent native
+transaction samples, not all-time spending or USD valuations.**
+
+Users can generate a server-computed Wallet Passport snapshot with its SHA-256
+digest, optionally anchor that digest in a real zero-value self-transaction on
+Base Sepolia (testnet gas is charged), and export or share a branded,
+privacy-conscious receipt. Wallet-signature authentication proves account
+control, not financial trustworthiness. Anchored receipts require independent
+onchain confirmation and never happen automatically. The repair verification
+module remains under Repair Lab for advanced use.
+
+**New optional secret:** `BLOCKSCOUT_API_KEY`. No schema migration is required;
+wallet passports are stored in the existing `verrift_state` JSON state.
+
 # VERRIFT | The Proof-of-Fix Network
 
 **Vercel runtime hotfix:** This release separates the static website (`public/`) from the Vercel API (`api/index.js`). The local development server lives in `scripts/dev-server.js`. Before pushing over an older extraction, remove the obsolete root `server.js`. See `VERCEL_HOTFIX.md` for exact WSL instructions and environment settings.

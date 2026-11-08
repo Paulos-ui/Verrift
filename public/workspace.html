@@ -1,21 +1,21 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#ffffff"><meta name="description" content="VERRIFT. From broken software to proven repairs, with evidence-first verification and Base Sepolia rewards."><title>VERRIFT | The Proof-of-Fix Network</title><meta property="og:title" content="VERRIFT | The Proof-of-Fix Network"><meta property="og:description" content="Reproduce the failure. Verify the repair. Record the evidence on Base."><meta property="og:type" content="website"><meta name="twitter:card" content="summary"><link rel="icon" type="image/svg+xml" href="/mark.svg"><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/ui-v5.css"><link rel="stylesheet" href="/ui-v6.css"><script type="module" src="/app.js"></script></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#ffffff"><meta name="description" content="VERRIFT. From broken software to proven repairs, with evidence-first verification and Base Sepolia rewards."><title>VERRIFT | The Proof-of-Fix Network</title><meta property="og:title" content="VERRIFT | The Proof-of-Fix Network"><meta property="og:description" content="Reproduce the failure. Verify the repair. Record the evidence on Base."><meta property="og:type" content="website"><meta name="twitter:card" content="summary_large_image"><meta property="og:image" content="https://verrift.vercel.app/og-wallet.png"><meta name="twitter:image" content="https://verrift.vercel.app/og-wallet.png"><link rel="icon" type="image/svg+xml" href="/mark.svg"><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/ui-v5.css"><link rel="stylesheet" href="/ui-v6.css"><link rel="stylesheet" href="/passport.css"><script type="module" src="/app.js"></script></head>
 <body>
 <div class="shell">
  <aside class="rail" aria-label="Primary navigation">
    <a class="brand" href="/" aria-label="VERRIFT home"><span class="brand-icon">V<span class="brand-tick">/</span></span><span class="brand-word">VERRIFT<small>THE PROOF-OF-FIX NETWORK</small></span></a>
    <div class="rail-divider"></div><div class="rail-label">CONNECTED WORKSPACE / BASE</div>
    <nav class="rail-nav" aria-label="Workspace">
-    <button type="button" data-view="overview" class="nav-item active"><span class="nav-icon">▦</span> <span class="nav-desktop">Overview</span><span class="nav-mobile">Overview</span> <span class="nav-arrow">↗</span></button>
-    <button type="button" data-view="cases" class="nav-item"><span class="nav-icon">⌁</span> <span class="nav-desktop">Repair cases</span><span class="nav-mobile">Cases</span> <span id="case-counter" class="nav-count">0</span></button>
-    <button type="button" data-view="domains" class="nav-item"><span class="nav-icon">◎</span> <span class="nav-desktop">Verified domains</span><span class="nav-mobile">Domains</span></button>
+    <button type="button" data-view="overview" class="nav-item active"><span class="nav-icon">▦</span> <span class="nav-desktop">Wallet passport</span><span class="nav-mobile">Wallet</span> <span class="nav-arrow">↗</span></button>
+    <button type="button" data-view="cases" class="nav-item"><span class="nav-icon">⌁</span> <span class="nav-desktop">Repair lab</span><span class="nav-mobile">Lab</span> <span id="case-counter" class="nav-count">0</span></button>
+    <button type="button" data-view="domains" class="nav-item"><span class="nav-icon">◎</span> <span class="nav-desktop">Verified sites</span><span class="nav-mobile">Sites</span></button>
     <a href="/docs" class="nav-item"><span class="nav-icon">◫</span> <span class="nav-desktop">Product manual</span><span class="nav-mobile">Docs</span> <span class="nav-arrow">↗</span></a>
    </nav>
    <div class="rail-foot"><div class="shift"><span class="pulse" aria-hidden="true"></span> SHIFT 02 / LIVE BUILD</div><p>Proof over promises.<br>Every result has a source.</p><a class="rail-link" href="https://sepolia.basescan.org" target="_blank" rel="noopener noreferrer">Base Sepolia explorer ↗</a><a class="rail-link" href="/admin" id="admin-link" hidden>Operator console ↗</a><button type="button" id="logout" class="text-action" hidden>Sign out</button></div>
  </aside>
  <div class="app-body">
-  <header class="topbar"><div class="mobile-brand">VERRIFT <span class="small-accent">/</span></div><div class="crumb"><a href="/" title="Visit public home">HOME ↗</a> &nbsp; WORKSPACE <span>/</span> <strong id="crumb-view">OVERVIEW</strong></div><div class="topbar-right"><span class="network-pill">● BASE SEPOLIA <i>TESTNET</i></span><button type="button" id="wallet-button" class="wallet-button">Connect wallet <span>↗</span></button></div></header>
+  <header class="topbar"><div class="mobile-brand">VERRIFT <span class="small-accent">/</span></div><div class="crumb"><a href="/" title="Visit public home">HOME ↗</a> &nbsp; WORKSPACE <span>/</span> <strong id="crumb-view">OVERVIEW</strong></div><div class="topbar-right"><span class="network-pill">● BASE <i>MAINNET INSIGHTS</i></span><button type="button" id="wallet-button" class="wallet-button">Connect wallet <span>↗</span></button></div></header>
   <main id="content" tabindex="-1" aria-live="polite"><div class="loader">Loading your workspace...</div></main>
   <footer class="main-footer"><span>VERRIFT / EVERY FIX LEAVES EVIDENCE.</span><span>BUILD BY JAYKING · <a href="https://github.com/paulos-ui" target="_blank" rel="noopener">GITHUB ↗</a></span></footer>
  </div>
@@ -27,10 +27,10 @@
   <div class="wallet-dialog-header"><span>VERRIFT / WALLET ACCESS</span><button id="wallet-picker-close" type="button" class="wallet-close" aria-label="Close wallet selection">×</button></div>
   <div class="wallet-dialog-icon" aria-hidden="true">V<span>/</span></div>
   <h2 id="wallet-picker-title">Choose your<br><em>wallet.</em></h2>
-  <p id="wallet-picker-description">Connect a wallet to create repair cases, verify your websites and preserve evidence. Your wallet may ask you to switch to Base Sepolia and sign a login message. Signing in does not transfer funds.</p>
+  <p id="wallet-picker-description">Connect your wallet to see real Base Mainnet activity, repeated transaction partners and a branded verification receipt. Signing in is free. Optional onchain proof uses Base Sepolia testnet gas.</p>
   <div id="wallet-options" class="wallet-options" aria-live="polite"><span>Looking for available wallets...</span></div>
   <p id="wallet-picker-error" class="wallet-error" role="alert" hidden></p>
-  <p class="wallet-privacy">NO PASSWORDS · NO PRIVATE KEYS · BASE SEPOLIA TESTNET</p>
+  <p class="wallet-privacy">NO PASSWORDS · NO PRIVATE KEYS · BASE MAINNET READS</p>
  </div>
 </dialog>
 </body></html>

@@ -55,7 +55,8 @@ export async function connectWallet(choice) {
  provider = choice.provider;
  const accounts = await provider.request({method:'eth_requestAccounts'});
  if (!accounts?.[0]) throw Error('Your wallet did not return an account.');
- await ensureChain();
+ // Do not force a network switch for read-only wallet analytics or SIWE login.
+ // Only explicit Base Sepolia proof transactions call ensureChain().
  return accounts[0];
 }
 export async function currentWallet(preferAddress) {
