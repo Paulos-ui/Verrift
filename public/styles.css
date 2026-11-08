@@ -15,3 +15,163 @@ dialog{border:1px solid #c7d0c3;padding:0;background:#f5f5ef;color:var(--ink);bo
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{animation:none!important;transition:none!important}}
 .report-wrap{padding:15px 0 65px}.report-hero{padding:70px 0;border-bottom:1px solid var(--edge)}.report-hero h1{font:clamp(48px,6vw,86px)/1.04 var(--serif);letter-spacing:-.07em;max-width:1000px;overflow-wrap:anywhere}.report-hero h1 span{color:var(--accent)}.report-intro{font:15px/1.8 var(--sans);color:#69766b;max-width:650px}.report-state{display:flex;align-items:center;gap:20px;font:10px var(--mono);color:#89978a;margin-top:32px}.report-columns{display:grid;grid-template-columns:1fr 1.1fr;gap:55px;padding:55px 0;border-bottom:1px solid var(--edge)}.report-columns p{font-size:12px;line-height:1.9;color:#657268;overflow-wrap:anywhere}.report-columns strong{display:block;color:#303d33}.report-columns h2{font:27px var(--serif);letter-spacing:-.03em;margin:32px 0 11px}.report-steps{white-space:pre-wrap}.report-chain{padding:50px 0;border-bottom:1px solid var(--edge)}.report-chain>div:not(.detail-label){padding:15px 0;font:11px var(--mono)}.report-chain strong{font-weight:700}.report-chain p{line-height:1.7;color:#697b6b;word-break:break-word}.report-chain a{color:#496a4d;text-decoration:underline}.report-disclaimer{padding:27px 0;max-width:680px;font:11px/1.9 var(--mono);color:#879589}.report-footer{border-top:1px solid var(--edge);padding:20px 0;font:10px var(--mono);color:#849182}.report-error{min-height:60vh;display:flex;flex-direction:column;justify-content:center}.report-error h1{font:55px var(--serif)}.report-error p{color:#ab604b}@media(max-width:640px){.report-columns{grid-template-columns:1fr;gap:32px}.report-hero{padding:45px 0}.report-hero h1{font-size:48px}.report-state{flex-wrap:wrap}}
 .proof-delta{display:flex;align-items:center;gap:10px;padding:20px;margin:25px 0 0;border:1px solid #d1dbcf;background:#e3e9df}.proof-delta>div:first-child,.proof-delta>div:nth-child(3){min-width:0;flex:1}.proof-delta small{display:block;font:9px var(--mono);color:#758679;margin-bottom:9px}.proof-delta strong{display:block;font:28px var(--serif);letter-spacing:-.05em}.proof-delta strong span{font:12px var(--mono)}.proof-delta p{font:8px var(--mono);color:#839284;overflow-wrap:anywhere;margin:7px 0 0}.delta-bridge{font:30px var(--serif);color:var(--accent)}.delta-verdict{font:9px/1.8 var(--mono);color:#436b51;border-left:1px solid #c5d2c4;padding-left:12px}.delta-verdict span{color:#859386}@media(max-width:640px){.proof-delta{flex-wrap:wrap}.proof-delta .delta-verdict{width:100%;border-left:0;border-top:1px solid #c5d2c4;padding:10px 0 0}}
+/* VERRIFT V7, Wallet Passport. Clean, original evidence-editorial system. */
+.passport-page{max-width:1440px;margin:0 auto;padding:clamp(25px,4vw,62px) clamp(20px,3.8vw,62px) 80px;color:#153a32}
+.passport-heading{display:flex;justify-content:space-between;align-items:end;gap:24px;margin-bottom:30px}
+.passport-heading h1{font-family:Georgia,serif;font-weight:400;letter-spacing:-.056em;font-size:clamp(49px,6.2vw,91px);line-height:.98;margin:15px 0 18px;color:#152e2a}
+.passport-heading h1 em{color:#3177a5;font-weight:400}
+.passport-heading p:not(.eyebrow){max-width:560px;color:#68756f;line-height:1.7;margin:0}
+.passport-refresh{border:1px solid #d6dfda;background:white;color:#20443c;padding:13px 18px;cursor:pointer;font-weight:700;white-space:nowrap}
+.passport-refresh:hover{background:#edf7f2}
+.passport-hero{border-radius:16px;background:#153f35;display:grid;grid-template-columns:minmax(0,1.6fr) minmax(270px,.8fr);gap:20px;color:white;padding:clamp(23px,4vw,46px);position:relative;overflow:hidden}
+.passport-hero::after{content:'';position:absolute;right:-90px;top:-140px;border:1px solid #7cbaa45c;width:530px;height:530px;border-radius:50%;pointer-events:none}
+.passport-hero::before{content:'';position:absolute;right:-10px;top:-50px;border:1px solid #7cbaa45c;width:330px;height:330px;border-radius:50%;pointer-events:none}
+.passport-hero-copy,.passport-hero-right{position:relative;z-index:1}
+.passport-meta{font:600 10px ui-monospace,monospace;letter-spacing:.14em;color:#b4d3c5;display:flex;justify-content:space-between;gap:10px}
+.passport-symbol{display:grid;place-items:center;width:61px;height:61px;border-radius:12px;border:1px solid #a2cdb9;margin:34px 0 25px;font:56px Georgia,serif;color:#fff;position:relative}
+.passport-symbol span{position:absolute;color:#9ee3c6;font:700 27px Arial;right:7px;top:5px}
+.passport-hero h2{font:400 clamp(43px,4.1vw,67px)/1.03 Georgia,serif;letter-spacing:-.04em;margin:0 0 18px}
+.passport-hero h2 em{font-weight:400;color:#a2d8bc}
+.passport-hero-copy>p{max-width:460px;line-height:1.72;color:#d1e3d9;font-size:15px}
+.passport-address{display:flex;flex-wrap:wrap;align-items:center;gap:13px;margin-top:28px;padding-top:18px;border-top:1px solid #ffffff30}
+.passport-address span{font:600 10px ui-monospace,monospace;letter-spacing:.1em;color:#b4d3c5}
+.passport-address strong{font:600 14px ui-monospace,monospace}
+.passport-address button{padding:8px 12px;color:#ffffff;background:transparent;border:1px solid #93b9aa9c;cursor:pointer}
+.passport-hero-right{display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:20px;max-width:300px;justify-self:end;width:100%}
+.passport-seal{display:flex;align-items:center;flex-direction:column;justify-content:center;aspect-ratio:1.15;border:1px solid #cce9d35e;border-radius:50%;background:#ffffff0c;text-align:center;transform:rotate(3deg)}
+.passport-seal>span{font:44px Georgia,serif;color:#b3e4c9}
+.passport-seal strong{font:700 15px/1.55 ui-monospace,monospace;letter-spacing:.08em}
+.passport-seal small{font-size:12px;color:#c7e0d2;margin-top:8px}
+.passport-hero-actions{display:grid;gap:8px}.passport-hero-actions button{min-height:48px;padding:12px 15px;display:flex;justify-content:space-between;align-items:center;font-weight:700;cursor:pointer;border-radius:6px}.passport-primary{color:#173d32;background:#b5ebcf;border:1px solid #b5ebcf}.passport-secondary{color:#fff;background:transparent;border:1px solid #93b9aa9c}.passport-chain-note{font-size:11px;color:#c4ddd0;line-height:1.5;text-align:center}
+.passport-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border:1px solid #e0e8e3;margin:22px 0;background:#fff;border-radius:12px;overflow:hidden}
+.passport-metric{min-width:0;padding:25px 19px;border-right:1px solid #e1e9e4;display:flex;flex-direction:column;gap:14px}.passport-metric:last-child{border-right:0}.passport-metric-index{font:700 10px ui-monospace,monospace;letter-spacing:.06em;color:#6f867b}.passport-metric strong{font:500 clamp(20px,2.1vw,33px)/1.1 Georgia,serif;overflow-wrap:anywhere}.passport-metric small{color:#77877f;font-size:12px}
+.passport-info-note{display:flex;gap:17px;align-items:center;padding:10px 3px 25px;border-bottom:1px solid #e0e8e3}.passport-info-note span{font:700 10px ui-monospace,monospace;letter-spacing:.1em;white-space:nowrap;color:#34719b}.passport-info-note p{font-size:12px;flex:1;color:#657771;line-height:1.5;margin:0}.passport-info-note a{font-size:12px;white-space:nowrap;color:#246d99;text-decoration:none}
+.passport-lower{display:grid;grid-template-columns:1.16fr 1fr;gap:22px;margin-top:31px;align-items:start}.passport-panel{border:1px solid #e1e8e4;background:white;border-radius:13px;overflow:hidden}.passport-panel-header{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:27px 26px 22px;border-bottom:1px solid #e1e8e4}.passport-panel-header span,.passport-proof-status>span{font:700 10px ui-monospace,monospace;letter-spacing:.09em;color:#44735e}.passport-panel-header h2{font:400 32px/1.2 Georgia,serif;letter-spacing:-.03em;margin:9px 0 0}.passport-count{white-space:nowrap}
+.passport-history{display:flex;flex-direction:column}.passport-tx{display:flex;align-items:center;gap:13px;padding:15px 25px;border-bottom:1px solid #edf0ed;color:#14382f;text-decoration:none}.passport-tx:hover,.passport-counterparties a:hover{background:#f5faf7}.passport-tx>div{flex:1;display:grid;gap:5px;min-width:0}.passport-tx strong{font-weight:650;font-size:14px}.passport-tx small{color:#78887e;font-size:12px;overflow:hidden;text-overflow:ellipsis}.passport-tx>span:last-child{font-size:12px;color:#27709a}.passport-dir{display:grid;place-items:center;border-radius:11px;width:38px;height:38px;flex:none;background:#e9f5ef;color:#377654;font-size:19px}.passport-dir.out{background:#edf4fa;color:#3074a0}
+.passport-empty{padding:27px;color:#264940;min-height:135px}.passport-empty p{font-size:13px;line-height:1.65;color:#7b8882;max-width:460px}
+.passport-counterparties{padding:4px 0}.passport-counterparties a{display:flex;justify-content:space-between;padding:14px 25px;gap:12px;text-decoration:none;border-bottom:1px solid #edf0ed;color:#214139;font-size:12px}.passport-counterparties a b{color:#6d877b}.passport-counterparties a strong{color:#2e7294;font-weight:600}.passport-proof-status{margin:23px;border-radius:11px;background:#ebf6f0;padding:24px}.passport-proof-status h3{font:400 28px Georgia,serif;color:#21483b;letter-spacing:-.025em;margin:12px 0}.passport-proof-status p{font-size:13px;color:#5c746a;line-height:1.65}.passport-inline-btn{border:0;background:#1e5947;color:white;padding:12px 17px;cursor:pointer;border-radius:5px;margin-top:10px}
+.passport-dev{border-top:1px solid #e0e8e3;display:flex;gap:30px;align-items:center;justify-content:space-between;padding:36px 0;margin-top:35px}.passport-dev span{font:700 10px ui-monospace,monospace;letter-spacing:.11em;color:#36795f}.passport-dev h2{font:400 32px Georgia,serif;letter-spacing:-.02em;margin:13px 0 7px}.passport-dev p{font-size:13px;color:#77877f;margin:0}.passport-dev button{background:#fff;border:1px solid #cfdbd3;color:#194132;padding:13px 18px;white-space:nowrap;cursor:pointer}
+.passport-receipt{color:#214238}.passport-receipt-brand{font:700 13px ui-monospace,monospace;display:flex;justify-content:space-between;gap:15px;letter-spacing:.09em;color:#1c5341}.passport-receipt-brand span{font-size:10px}.passport-receipt h3{font:400 40px Georgia,serif;margin:26px 0 15px}.passport-receipt>p{color:#6f8078;font-size:13px;line-height:1.65}.passport-receipt-meta{display:grid;grid-template-columns:100px 1fr;gap:15px;padding:20px;background:#ecf7f0;margin:20px 0}.passport-receipt-meta span{font:700 10px ui-monospace,monospace;color:#527c69}.passport-receipt-meta b{font-size:12px}.passport-receipt-meta code{font-size:11px;overflow-wrap:anywhere}.passport-receipt-actions,.passport-congrats-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}.passport-receipt-actions button{border:1px solid #ccdcd1;background:white;padding:12px;cursor:pointer}.passport-receipt-warning{font-size:11px!important}.passport-congrats-icon{display:grid;place-items:center;color:#185a42;background:#c9f3d7;font-size:27px;width:58px;height:58px;border-radius:50%}.passport-congrats h3{font:400 38px Georgia,serif;letter-spacing:-.03em;margin:20px 0 12px}.passport-congrats p{line-height:1.65;color:#6d7e73}
+@media(max-width:1030px){.passport-lower{grid-template-columns:1fr}.passport-metrics{grid-template-columns:repeat(2,1fr)}.passport-metric:nth-child(2){border-right:0}.passport-metric:nth-child(-n+2){border-bottom:1px solid #e0e8e3}}
+@media(max-width:740px){.passport-heading{display:block}.passport-refresh{margin:20px 0 0}.passport-page{padding:30px 17px 55px}.passport-hero{grid-template-columns:1fr}.passport-hero-right{justify-self:start;max-width:none}.passport-seal{width:180px;max-height:160px;aspect-ratio:1.2}.passport-hero h2{font-size:47px}.passport-hero-actions{grid-template-columns:1fr 1fr}.passport-hero-actions button{font-size:12px;gap:6px}.passport-metric{padding:19px 12px}.passport-metric strong{font-size:26px}.passport-info-note{display:block}.passport-info-note p{margin:10px 0}.passport-lower{gap:16px}.passport-dev{display:block}.passport-dev button{margin-top:19px}.passport-panel-header{padding:20px}.passport-panel-header h2{font-size:27px}.passport-tx{padding:14px}.passport-counterparties a{padding:14px}}
+@media(prefers-reduced-motion:reduce){.passport-hero::before,.passport-hero::after{animation:none!important}}
+
+/* === VERRIFT V8: HUMANIZED EDITORIAL LEDGER (ZERO AI MOTION) === */
+*, *::before, *::after {
+  animation: none !important;
+  transition-duration: 60ms !important;
+  transition-timing-function: steps(2, end) !important;
+}
+
+.verrift-dossier-shell {
+  max-width: 1160px;
+  margin: 2.5rem auto;
+  padding: 0 1.25rem;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #e6e4e0;
+}
+
+.verrift-ledger-header {
+  border: 1px solid #2e2e2c;
+  background: #0d0d0c;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.verrift-ledger-tag {
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #10b981;
+  border: 1px solid #10b981;
+  padding: 0.15rem 0.5rem;
+}
+
+.verrift-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  border-left: 1px solid #2e2e2c;
+  border-right: 1px solid #2e2e2c;
+  border-bottom: 1px solid #2e2e2c;
+  background: #0a0a09;
+}
+
+.verrift-cell {
+  padding: 1.5rem;
+  border-right: 1px solid #2e2e2c;
+  border-bottom: 1px solid #2e2e2c;
+}
+
+.verrift-cell:last-child {
+  border-right: none;
+}
+
+.verrift-mono-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #8c8a84;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.verrift-cell h3 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin: 0 0 0.85rem 0;
+  color: #f5f3ef;
+  letter-spacing: -0.01em;
+}
+
+.verrift-fix-item, .verrift-verifier-item, .verrift-tier-item {
+  border: 1px solid #222220;
+  background: #121210;
+  padding: 0.85rem;
+  margin-bottom: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.verrift-code-line {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.74rem;
+  color: #d4d2cd;
+  background: #080807;
+  border: 1px solid #262624;
+  padding: 0.4rem 0.55rem;
+  margin-top: 0.45rem;
+  overflow-x: auto;
+  display: block;
+}
+
+.verrift-action-btn {
+  margin-top: 0.6rem;
+  width: 100%;
+  background: #f5f3ef;
+  color: #0a0a09;
+  border: 1px solid #f5f3ef;
+  padding: 0.45rem 0.75rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.verrift-action-btn:hover {
+  background: #10b981;
+  border-color: #10b981;
+  color: #050505;
+}
+
+.verrift-delta-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  color: #f59e0b;
+  float: right;
+}

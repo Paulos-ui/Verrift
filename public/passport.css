@@ -38,3 +38,123 @@
 @media(max-width:1030px){.passport-lower{grid-template-columns:1fr}.passport-metrics{grid-template-columns:repeat(2,1fr)}.passport-metric:nth-child(2){border-right:0}.passport-metric:nth-child(-n+2){border-bottom:1px solid #e0e8e3}}
 @media(max-width:740px){.passport-heading{display:block}.passport-refresh{margin:20px 0 0}.passport-page{padding:30px 17px 55px}.passport-hero{grid-template-columns:1fr}.passport-hero-right{justify-self:start;max-width:none}.passport-seal{width:180px;max-height:160px;aspect-ratio:1.2}.passport-hero h2{font-size:47px}.passport-hero-actions{grid-template-columns:1fr 1fr}.passport-hero-actions button{font-size:12px;gap:6px}.passport-metric{padding:19px 12px}.passport-metric strong{font-size:26px}.passport-info-note{display:block}.passport-info-note p{margin:10px 0}.passport-lower{gap:16px}.passport-dev{display:block}.passport-dev button{margin-top:19px}.passport-panel-header{padding:20px}.passport-panel-header h2{font-size:27px}.passport-tx{padding:14px}.passport-counterparties a{padding:14px}}
 @media(prefers-reduced-motion:reduce){.passport-hero::before,.passport-hero::after{animation:none!important}}
+
+/* === VERRIFT V8: HUMANIZED EDITORIAL LEDGER (ZERO AI MOTION) === */
+*, *::before, *::after {
+  animation: none !important;
+  transition-duration: 60ms !important;
+  transition-timing-function: steps(2, end) !important;
+}
+
+.verrift-dossier-shell {
+  max-width: 1160px;
+  margin: 2.5rem auto;
+  padding: 0 1.25rem;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #e6e4e0;
+}
+
+.verrift-ledger-header {
+  border: 1px solid #2e2e2c;
+  background: #0d0d0c;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.verrift-ledger-tag {
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #10b981;
+  border: 1px solid #10b981;
+  padding: 0.15rem 0.5rem;
+}
+
+.verrift-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  border-left: 1px solid #2e2e2c;
+  border-right: 1px solid #2e2e2c;
+  border-bottom: 1px solid #2e2e2c;
+  background: #0a0a09;
+}
+
+.verrift-cell {
+  padding: 1.5rem;
+  border-right: 1px solid #2e2e2c;
+  border-bottom: 1px solid #2e2e2c;
+}
+
+.verrift-cell:last-child {
+  border-right: none;
+}
+
+.verrift-mono-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #8c8a84;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.verrift-cell h3 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin: 0 0 0.85rem 0;
+  color: #f5f3ef;
+  letter-spacing: -0.01em;
+}
+
+.verrift-fix-item, .verrift-verifier-item, .verrift-tier-item {
+  border: 1px solid #222220;
+  background: #121210;
+  padding: 0.85rem;
+  margin-bottom: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.verrift-code-line {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.74rem;
+  color: #d4d2cd;
+  background: #080807;
+  border: 1px solid #262624;
+  padding: 0.4rem 0.55rem;
+  margin-top: 0.45rem;
+  overflow-x: auto;
+  display: block;
+}
+
+.verrift-action-btn {
+  margin-top: 0.6rem;
+  width: 100%;
+  background: #f5f3ef;
+  color: #0a0a09;
+  border: 1px solid #f5f3ef;
+  padding: 0.45rem 0.75rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.verrift-action-btn:hover {
+  background: #10b981;
+  border-color: #10b981;
+  color: #050505;
+}
+
+.verrift-delta-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  color: #f59e0b;
+  float: right;
+}
