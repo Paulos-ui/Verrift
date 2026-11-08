@@ -56,3 +56,44 @@ test('Supabase database adapter performs read and atomic compare-swap via REST',
   assert.equal(operations[0].auth,undefined); // Opaque secret key is sent as apikey, never as Bearer JWT.
  }finally{await new Promise(done=>server.close(done));}
 });
+
+test('Supabase Web3 error diagnostics identify disabled Ethereum provider without leaking credentials',async()=>{
+ const server=http.createServer(async(req,res)=>{
+  for await(const chunk of req){};
+  res.writeHead(422,{'content-type':'application/json'});
+  res.end(JSON.stringify({code:'web3_provider_disabled',message:'Ethereum Web3 provider is disabled'}));
+ });
+ await new Promise(done=>server.listen(0,'127.0.0.1',done));
+ const oldWarn=console.warn;
+ let warning;
+ console.warn=(...args)=>{warning=args};
+ try{
+  const url=`http://127.0.0.1:${server.address().port}`;
+  await assert.rejects(
+   exchangeWeb3({message:'secret example login challenge',signature:'secret test signature'}, {url,key:'sb_publishable_test'}),
+   err=>err.status===503&&/Enable Authentication/.test(err.message)&&!/secret example login challenge/.test(err.message)
+  );
+  assert.equal(warning[1].httpStatus,422);
+  assert.equal(warning[1].errorCode,'web3_provider_disabled');
+  assert.equal(JSON.stringify(warning).includes('secret'),false);
+ }finally{console.warn=oldWarn;await new Promise(done=>server.close(done));}
+});
+
+test('Supabase Web3 reports unapproved site URL and preserves useful 422 error codes',async()=>{
+ let code='';
+ const server=http.createServer(async(req,res)=>{
+  for await(const chunk of req){};
+  res.writeHead(422,{'content-type':'application/json'});
+  res.end(JSON.stringify(code==='origin'?{code:'invalid_grant',message:'Signed Ethereum message is using URI which is not allowed on this server'}:{code:'validation_failed',message:'Could not validate login message'}));
+ });
+ await new Promise(done=>server.listen(0,'127.0.0.1',done));
+ const oldWarn=console.warn;
+ console.warn=()=>{};
+ try{
+  const url=`http://127.0.0.1:${server.address().port}`;
+  code='origin';
+  await assert.rejects(exchangeWeb3({message:'message',signature:'signature'}, {url,key:'test'}),/Redirect URLs/);
+  code='validation';
+  await assert.rejects(exchangeWeb3({message:'message',signature:'signature'}, {url,key:'test'}),/code: validation_failed/);
+ }finally{console.warn=oldWarn;await new Promise(done=>server.close(done));}
+});

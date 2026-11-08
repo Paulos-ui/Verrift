@@ -100,3 +100,7 @@ The public landing at `/` introduces the concept. `/app` opens a public workspac
 V6 uses a deep forest-green navigation rail, white workspace surfaces, ocean-blue typographic accents, and restrained mint highlights. It does not contain an anonymous demo-mode dashboard. The authenticated controlled test target remains available for repeatable failure-to-repair evidence. No real funds or mainnet contracts are involved.
 
 For production, Supabase persistence and Ethereum authentication still must be configured, including the bundled SQL schema. A Vercel build alone cannot confirm this works.
+
+## Wallet sign-in troubleshooting
+
+If wallet selection works but Supabase returns HTTP 422 on `/auth/v1/token?grant_type=web3`, see [`WALLET_SIGNIN_FIX.md`](WALLET_SIGNIN_FIX.md). This release distinguishes a disabled Ethereum Web3 provider, an unapproved site URL, and generic authentication rejection.
