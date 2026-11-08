@@ -175,3 +175,231 @@ dialog{border:1px solid #c7d0c3;padding:0;background:#f5f5ef;color:var(--ink);bo
   color: #f59e0b;
   float: right;
 }
+/* === VERRIFT V9: WHITE ROOM SWISS ARCHIVAL LEDGER (PINE & TIDE) === */
+*, *::before, *::after {
+  animation: none !important;
+  transition: background-color 80ms linear, border-color 80ms linear, color 80ms linear !important;
+}
+
+.reveal {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+.chain-orbit {
+  display: none !important;
+}
+
+.verrift-dossier-shell {
+  max-width: 1200px;
+  margin: 3.5rem auto;
+  padding: 0 1.5rem;
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+  color: #0f172a;
+  background: #ffffff;
+}
+
+.verrift-ledger-header {
+  border: 1.5px solid #0f172a;
+  background: #f8fafc;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.verrift-ledger-header h2 {
+  margin: 0.2rem 0 0 0 !important;
+  font-size: 1.35rem !important;
+  font-weight: 700 !important;
+  color: #0f172a !important;
+  letter-spacing: -0.02em;
+}
+
+.verrift-ledger-tag {
+  font-family: ui-monospace, "JetBrains Mono", "SFMono-Regular", Menlo, monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #0f5132;
+  background: #d1fae5;
+  border: 1px solid #0f5132;
+  padding: 0.25rem 0.6rem;
+}
+
+.verrift-live-console {
+  border-left: 1.5px solid #0f172a;
+  border-right: 1.5px solid #0f172a;
+  border-bottom: 1.5px solid #0f172a;
+  background: #ffffff;
+  padding: 1.25rem 1.5rem;
+}
+
+.verrift-console-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  align-items: center;
+  margin-top: 0.6rem;
+}
+
+.verrift-address-input {
+  flex: 1 1 340px;
+  font-family: ui-monospace, "JetBrains Mono", monospace;
+  font-size: 0.82rem;
+  padding: 0.6rem 0.8rem;
+  border: 1.5px solid #0f172a;
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+.verrift-console-btn {
+  background: #0f5132;
+  color: #ffffff;
+  border: 1.5px solid #0f5132;
+  padding: 0.6rem 1rem;
+  font-family: ui-monospace, "JetBrains Mono", monospace;
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.verrift-console-btn.secondary {
+  background: #ffffff;
+  color: #0284c7;
+  border-color: #0284c7;
+}
+
+.verrift-console-btn:hover {
+  background: #0284c7;
+  border-color: #0284c7;
+  color: #ffffff;
+}
+
+.verrift-rpc-output {
+  margin-top: 0.85rem;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  padding: 0.85rem 1rem;
+  font-family: ui-monospace, "JetBrains Mono", monospace;
+  font-size: 0.76rem;
+  line-height: 1.55;
+  color: #0f172a;
+  font-variant-numeric: tabular-nums;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 0.75rem;
+}
+
+.verrift-metric-box {
+  border-left: 3px solid #0284c7;
+  padding-left: 0.65rem;
+}
+
+.verrift-metric-box small {
+  display: block;
+  font-size: 0.68rem;
+  color: #475569;
+  text-transform: uppercase;
+}
+
+.verrift-metric-box strong {
+  font-size: 0.92rem;
+  color: #0f172a;
+}
+
+.verrift-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  border-left: 1.5px solid #0f172a;
+  border-right: 1.5px solid #0f172a;
+  border-bottom: 1.5px solid #0f172a;
+  background: #ffffff;
+}
+
+.verrift-cell {
+  padding: 1.4rem;
+  border-right: 1px solid #cbd5e1;
+  border-bottom: 1px solid #cbd5e1;
+  background: #ffffff;
+}
+
+.verrift-cell:last-child {
+  border-right: none;
+}
+
+.verrift-mono-label {
+  font-family: ui-monospace, "JetBrains Mono", monospace;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #0284c7;
+  margin-bottom: 0.45rem;
+  display: block;
+}
+
+.verrift-cell h3 {
+  font-size: 1.02rem;
+  font-weight: 700;
+  margin: 0 0 0.85rem 0;
+  color: #0f172a;
+  letter-spacing: -0.01em;
+}
+
+.verrift-fix-item, .verrift-verifier-item, .verrift-tier-item {
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  padding: 0.85rem;
+  margin-bottom: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.verrift-code-line {
+  font-family: ui-monospace, "JetBrains Mono", monospace;
+  font-size: 0.71rem;
+  color: #0f172a;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  padding: 0.4rem 0.55rem;
+  margin-top: 0.45rem;
+  overflow-x: auto;
+  display: block;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.verrift-action-btn {
+  margin-top: 0.55rem;
+  width: 100%;
+  background: #0f172a;
+  color: #ffffff;
+  border: 1px solid #0f172a;
+  padding: 0.48rem 0.75rem;
+  font-family: ui-monospace, "JetBrains Mono", monospace;
+  font-size: 0.73rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.verrift-action-btn:hover {
+  background: #0f5132;
+  border-color: #0f5132;
+  color: #ffffff;
+}
+
+.verrift-delta-badge {
+  font-family: ui-monospace, "JetBrains Mono", monospace;
+  font-size: 0.7rem;
+  color: #0f5132;
+  background: #d1fae5;
+  border: 1px solid #0f5132;
+  padding: 0.1rem 0.4rem;
+  float: right;
+  font-weight: 700;
+}

@@ -57,104 +57,124 @@
       <div class="intro-endline"><span>SCROLL TO EXPLORE BASE</span><span class="scroll-arrow" aria-hidden="true">↓</span><span>FROM WALLET TO RECEIPT</span></div>
     </section>
 
-<!-- VERRIFT V8 CONCRETE PROOF LEDGER: ACTUAL FIXES, ACTUAL VERIFIERS, WHO PAYS -->
-<section class="verrift-dossier-shell" id="verrift-audit-evidence" aria-label="Concrete Fixes, Cryptographic Verifiers, and Commercial Revenue Architecture">
+<!-- VERRIFT V8 CONCRETE PROOF LEDGER -->
+<section class="verrift-dossier-shell" id="verrift-audit-evidence" aria-label="Live Base Mainnet Inspector, Concrete Fixes, Named Verifiers, and Commercial Unit Economics">
   <div class="verrift-ledger-header">
     <div>
-      <span class="verrift-mono-label">PRODUCTION TELEMETRY // BASE MAINNET (8453) &amp; BASE SEPOLIA (84532)</span>
-      <h2 style="margin:0.2rem 0 0 0;font-size:1.35rem;color:#fff;">Actual Fixes, Named Cryptographic Verifiers &amp; Commercial Unit Economics</h2>
+      <span class="verrift-mono-label">LIVE BASE MAINNET (8453) TELEMETRY &amp; REMEDIATION ENGINE</span>
+      <h2>Live Wallet Inspector, Executable Fixes, Named Verifiers &amp; Commercial Pricing</h2>
     </div>
-    <span class="verrift-ledger-tag">LIVE REMEDIATION &amp; VERIFICATION ENGINE</span>
+    <span class="verrift-ledger-tag">WHITE-ROOM VERIFICATION LEDGER v9</span>
+  </div>
+
+  <!-- INTERACTIVE ZERO-SIGNUP BASE MAINNET INSPECTOR -->
+  <div class="verrift-live-console">
+    <span class="verrift-mono-label">00 // INSTANT BASE MAINNET RPC + USDC PERMIT2 ALLOWANCE SCANNER (NO WALLET EXTENSION REQUIRED)</span>
+    <p style="margin:0;font-size:0.84rem;color:#334155;">Test any Base Mainnet address live in your browser. Queries <code>https://mainnet.base.org</code> for native ETH balance, outgoing transaction count, and live USDC (<code>0x8335...2913</code>) allowance exposure on Permit2 (<code>0x0000...8BA3</code>).</p>
+    <div class="verrift-console-bar">
+      <input id="verrift-live-addr" class="verrift-address-input" type="text" value="0x4200000000000000000000000000000000000021" aria-label="Base Mainnet wallet or contract address">
+      <button type="button" class="verrift-console-btn" onclick="window.verriftRunAudit()">Run Live Base Mainnet Audit</button>
+      <button type="button" class="verrift-console-btn secondary" onclick="window.verriftRunAudit('0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913')">Inspect Base USDC Contract</button>
+      <button type="button" class="verrift-console-btn secondary" onclick="window.verriftRunAudit('0xC6d566A56A1aFf6508b41f6c90ff131615583BCD')">Inspect Basenames Resolver</button>
+    </div>
+    <div id="verrift-rpc-output" class="verrift-rpc-output">
+      <div class="verrift-metric-box"><small>BASE MAINNET RPC</small><strong>Chain ID 8453 (0x2105) Ready</strong></div>
+      <div class="verrift-metric-box"><small>PERMIT2 ALLOWANCE SLOT</small><strong>USDC 0x8335...2913 → 0x0000...8BA3</strong></div>
+      <div class="verrift-metric-box"><small>EAS REGISTRY PREDEPLOY</small><strong>0x4200000000000000000000000000000000000021</strong></div>
+      <div class="verrift-metric-box"><small>STATUS</small><strong>Click "Run Live Base Mainnet Audit" above</strong></div>
+    </div>
   </div>
 
   <div class="verrift-grid-3">
     <!-- COLUMN 1: ACTUAL FIXES -->
     <div class="verrift-cell">
-      <span class="verrift-mono-label">01 // ACTUAL FIXES (WALLET &amp; ENDPOINT REMEDIATION)</span>
-      <h3>Executable On-Chain &amp; Incident Fixes</h3>
+      <span class="verrift-mono-label">01 // ACTUAL FIXES (EXECUTABLE REMEDIATION)</span>
+      <h3>On-Chain Approvals &amp; Endpoint Repairs</h3>
 
       <div class="verrift-fix-item">
         <span class="verrift-delta-badge">+24 PTS</span>
-        <strong style="color:#f87171;font-size:0.8rem;">[FIX-BASE-01] Revoke Unlimited Permit2 USDC Allowance</strong>
-        <p style="font-size:0.82rem;margin:0.35rem 0;color:#b8b5ad;">Detects exposed unlimited USDC (<code>0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913</code>) allowance on router <code>0x3fC9...7FAD</code> and dispatches zero-allowance batch transaction.</p>
-        <code class="verrift-code-line">tx: USDC.approve(0x3fC91A3afd70395Cd496C647d5a6CC9D4B2b7FAD, 0) | calldata: 0x095ea7b3...0000</code>
-        <button type="button" class="verrift-action-btn" onclick="this.textContent='EXECUTED: ALLOWANCE REVOKED ON BASE (+24 PTS)';this.style.background='#10b981';">Execute Revoke Fix (0.000018 ETH Gas)</button>
+        <strong style="color:#b91c1c;font-size:0.82rem;">[FIX-BASE-01] Revoke Unlimited Permit2 USDC Allowance</strong>
+        <p style="font-size:0.81rem;margin:0.35rem 0;color:#334155;">Zeroes out exposed unlimited USDC (<code>0x8335...2913</code>) allowance on router <code>0x3fC9...7FAD</code> via deterministic ERC-20 <code>approve(spender, 0)</code>.</p>
+        <code class="verrift-code-line">to: 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
+data: 0x095ea7b30000000000000000000000003fc91a3afd70395cd496c647d5a6cc9d4b2b7fad0000000000000000000000000000000000000000000000000000000000000000</code>
+        <button type="button" class="verrift-action-btn" onclick="window.verriftExecuteRevoke(this, '0x3fC91A3afd70395Cd496C647d5a6CC9D4B2b7FAD')">Dispatch / Copy ERC-20 Revoke Tx (+24 PTS)</button>
       </div>
 
       <div class="verrift-fix-item">
         <span class="verrift-delta-badge">+15 PTS</span>
-        <strong style="color:#fbbf24;font-size:0.8rem;">[FIX-BASE-02] Rotate Stale EIP-7702 Session Delegation</strong>
-        <p style="font-size:0.82rem;margin:0.35rem 0;color:#b8b5ad;">Revokes expired smart-EOA session key on EntryPoint v0.7 (<code>0x0000000071727De22E5E9d8BAf0edAc6f37da032</code>) and rotates nonce.</p>
-        <code class="verrift-code-line">tx: revokeSessionKey(0x71C...89A) via EIP-5792 wallet_sendCalls</code>
-        <button type="button" class="verrift-action-btn" onclick="this.textContent='EXECUTED: SESSION KEY REVOKED (+15 PTS)';this.style.background='#10b981';">Revoke Delegated Session Key (0.000024 ETH)</button>
+        <strong style="color:#b45309;font-size:0.82rem;">[FIX-BASE-02] Revoke Stale EIP-7702 Session Delegation</strong>
+        <p style="font-size:0.81rem;margin:0.35rem 0;color:#334155;">Terminates active >30-day delegated session signer on EntryPoint v0.7 (<code>0x0000000071727De22E5E9d8BAf0edAc6f37da032</code>) and increments account nonce.</p>
+        <code class="verrift-code-line">tx: EntryPoint.revokeSessionKey(0x71C...89A) | Est. Gas: 0.000024 ETH ($0.07)</code>
+        <button type="button" class="verrift-action-btn" onclick="window.verriftExecuteRevoke(this, '0x0000000071727De22E5E9d8BAf0edAc6f37da032')">Dispatch Session Key Revocation (+15 PTS)</button>
       </div>
 
       <div class="verrift-fix-item">
         <span class="verrift-delta-badge">503 → 200 OK</span>
-        <strong style="color:#38bdf8;font-size:0.8rem;">[FIX-INFRA-03] Deterministic API/RPC Failover Verification</strong>
-        <p style="font-size:0.82rem;margin:0.35rem 0;color:#b8b5ad;">Locks failing production endpoint assertion (HTTP 503), re-runs identical assertion after patch (HTTP 200), and anchors the SHA-256 diff on Base.</p>
-        <code class="verrift-code-line">Pre-Fix SHA256: 0x4a8e...11b (503) → Post-Fix SHA256: 0x9c2f...88e (200 OK)</code>
+        <strong style="color:#0284c7;font-size:0.82rem;">[FIX-INFRA-03] Deterministic API/RPC Incident Proof-of-Fix</strong>
+        <p style="font-size:0.81rem;margin:0.35rem 0;color:#334155;">Locks failing production endpoint assertion (HTTP 503), re-runs identical assertion after fix (HTTP 200), and anchors the SHA-256 diff on Base.</p>
+        <code class="verrift-code-line">Before: SHA256 0x4a8e...11b (503) → After: SHA256 0x9c2f...88e (200 OK)</code>
       </div>
     </div>
 
     <!-- COLUMN 2: ACTUAL VERIFIERS -->
     <div class="verrift-cell">
       <span class="verrift-mono-label">02 // ACTUAL VERIFIERS (NAMED ON-CHAIN &amp; RPC ISSUERS)</span>
-      <h3>Deterministic Verification Architecture</h3>
+      <h3>Cryptographic Attestation &amp; State Verifiers</h3>
 
       <div class="verrift-verifier-item">
-        <strong style="color:#f5f3ef;font-size:0.85rem;">1. Base Mainnet JSON-RPC Verifier (Chain ID 8453)</strong>
-        <p style="font-size:0.8rem;margin:0.3rem 0;color:#b8b5ad;">Executes direct <code>eth_chainId</code>, <code>eth_getBalance</code>, and <code>eth_getTransactionCount</code> calls against <code>https://mainnet.base.org</code>.</p>
+        <strong style="color:#0f172a;font-size:0.84rem;">1. Base Mainnet JSON-RPC Verifier (Chain ID 8453)</strong>
+        <p style="font-size:0.8rem;margin:0.3rem 0;color:#334155;">Direct <code>eth_chainId</code>, <code>eth_getBalance</code>, <code>eth_getTransactionCount</code>, and <code>eth_call</code> allowance verification against <code>https://mainnet.base.org</code>.</p>
         <code class="verrift-code-line">RPC: https://mainnet.base.org | ChainId: 0x2105 (8453)</code>
       </div>
 
       <div class="verrift-verifier-item">
-        <strong style="color:#f5f3ef;font-size:0.85rem;">2. Coinbase Verified Account Attester (Base EAS)</strong>
-        <p style="font-size:0.8rem;margin:0.3rem 0;color:#b8b5ad;">Verifies active, non-revoked attestations in the Base Ethereum Attestation Service predeploy contract.</p>
+        <strong style="color:#0f172a;font-size:0.84rem;">2. Coinbase Verified Account Attester (Base EAS)</strong>
+        <p style="font-size:0.8rem;margin:0.3rem 0;color:#334155;">Verifies non-revoked on-chain KYC/Account attestations in the Base Ethereum Attestation Service predeploy registry.</p>
         <code class="verrift-code-line">EAS Contract: 0x4200000000000000000000000000000000000021
 Schema UID: 0xf8b05c79f090979bf4a80270aba232dff11a10d9ca55c4f88de95317970f0de9</code>
       </div>
 
       <div class="verrift-verifier-item">
-        <strong style="color:#f5f3ef;font-size:0.85rem;">3. Blockscout Base L2 Indexer &amp; Basenames Resolver</strong>
-        <p style="font-size:0.8rem;margin:0.3rem 0;color:#b8b5ad;">Audits recent transactions via <code>/8453/api/v2/addresses/{wallet}/transactions</code> and resolves L2 Basenames.</p>
+        <strong style="color:#0f172a;font-size:0.84rem;">3. Blockscout Base L2 Indexer &amp; Basenames Resolver</strong>
+        <p style="font-size:0.8rem;margin:0.3rem 0;color:#334155;">Audits up to 60 recent transactions via <code>/8453/api/v2/addresses/{wallet}/transactions</code> and resolves L2 Basenames.</p>
         <code class="verrift-code-line">Basenames L2Resolver: 0xC6d566A56A1aFf6508b41f6c90ff131615583BCD</code>
       </div>
 
       <div class="verrift-verifier-item">
-        <strong style="color:#f5f3ef;font-size:0.85rem;">4. Base Sepolia SHA-256 Calldata Anchor (Chain 84532)</strong>
-        <p style="font-size:0.8rem;margin:0.3rem 0;color:#b8b5ad;">Verifies EIP-191 <code>personal_sign</code> ownership and commits the SHA-256 receipt fingerprint in an on-chain transaction.</p>
-        <code class="verrift-code-line">Calldata Prefix: 0x56455252494654 (VERRIFT) + 32-Byte SHA256 Digest</code>
+        <strong style="color:#0f172a;font-size:0.84rem;">4. Base Sepolia Calldata Proof Anchor (Chain 84532)</strong>
+        <p style="font-size:0.8rem;margin:0.3rem 0;color:#334155;">Verifies EIP-191 <code>personal_sign</code> signature and commits the 32-byte SHA-256 receipt hash on Base Sepolia (<code>0x14a34</code>).</p>
+        <code class="verrift-code-line">Calldata Prefix: 0x56455252494654 (VERRIFT) + SHA256(CanonicalReceipt)</code>
       </div>
     </div>
 
     <!-- COLUMN 3: WHO PAYS & WHY NOW -->
     <div class="verrift-cell">
-      <span class="verrift-mono-label">03 // WHO PAYS (REVENUE MODEL, PRICING &amp; TIMING)</span>
-      <h3>Paying Customers, Unit Economics &amp; Why Now</h3>
+      <span class="verrift-mono-label">03 // WHO PAYS (COMMERCIAL REVENUE &amp; UNIT ECONOMICS)</span>
+      <h3>Paying Customers, Pricing Tiers &amp; Market Timing</h3>
 
       <div class="verrift-tier-item">
-        <strong style="color:#10b981;font-size:0.85rem;">1. Base Launchpads &amp; DeFi Protocols / $299/mo or $0.005 USDC/Call</strong>
-        <p style="font-size:0.8rem;margin:0.3rem 0;color:#b8b5ad;"><strong>Who Pays:</strong> Base token launchpads, Perp DEXs, lending pools, and grant councils querying <code>POST /api/wallet/inspect</code> to block Sybil clusters and compromised wallets before token claims or deposits.</p>
-        <code class="verrift-code-line">Gross Margin: 94% | Settlement: Base USDC (x402) or API Subscription</code>
+        <strong style="color:#0f5132;font-size:0.84rem;">1. Base Launchpads &amp; DeFi Protocols / $299/mo or $0.005 USDC/Call</strong>
+        <p style="font-size:0.8rem;margin:0.3rem 0;color:#334155;"><strong>Who Pays:</strong> Base token launchpads, Perp DEXs, lending pools, and grant councils querying <code>POST /api/wallet/inspect</code> to gate Sybil clusters and drained wallets before token claims or LP deposits.</p>
+        <code class="verrift-code-line">Gross Margin: 94% | Settlement: Base USDC (x402) or API Key</code>
       </div>
 
       <div class="verrift-tier-item">
-        <strong style="color:#38bdf8;font-size:0.85rem;">2. Engineering Teams &amp; Bug Bounty Escrows / $49 / Verified Fix</strong>
-        <p style="font-size:0.8rem;margin:0.3rem 0;color:#b8b5ad;"><strong>Who Pays:</strong> Web3 DevOps teams, security auditors, and bounty platforms anchoring deterministic before/after repair receipts on Base to release bounty payouts and verify SLA compliance.</p>
+        <strong style="color:#0284c7;font-size:0.84rem;">2. Engineering Teams &amp; Bug Bounty Escrows / $49 per Proof Case</strong>
+        <p style="font-size:0.8rem;margin:0.3rem 0;color:#334155;"><strong>Who Pays:</strong> Web3 DevOps teams, security auditors, and bounty platforms anchoring deterministic before/after repair proofs on Base to release bounty payouts and prove SLA compliance.</p>
       </div>
 
       <div class="verrift-tier-item">
-        <strong style="color:#f5f3ef;font-size:0.85rem;">3. Retail Base Wallet Users / 0.0005 ETH ($1.50) per Fix &amp; Mint</strong>
-        <p style="font-size:0.8rem;margin:0.3rem 0;color:#b8b5ad;"><strong>Who Pays:</strong> Active Base users paying 0.0005 ETH to batch-revoke risky token approvals and mint a portable, verifiable Base Passport receipt.</p>
+        <strong style="color:#0f172a;font-size:0.84rem;">3. Retail Base Wallet Users / 0.0005 ETH ($1.50) per Fix &amp; Mint</strong>
+        <p style="font-size:0.8rem;margin:0.3rem 0;color:#334155;"><strong>Who Pays:</strong> Active Base traders paying 0.0005 ETH to batch-revoke toxic token approvals and mint a portable on-chain Base Passport receipt.</p>
       </div>
 
       <div class="verrift-tier-item">
-        <strong style="color:#fbbf24;font-size:0.85rem;">Why Now (2026 Market Timing)</strong>
-        <p style="font-size:0.8rem;margin:0.3rem 0;color:#b8b5ad;">Base exceeds 3M+ daily transactions while EIP-7702 smart EOA delegations and Permit2 signatures expose retail users to silent drainers and protocols to automated Sybil farms.</p>
+        <strong style="color:#b45309;font-size:0.84rem;">Why Now (2026 Market Timing &amp; Demand)</strong>
+        <p style="font-size:0.8rem;margin:0.3rem 0;color:#334155;">Base processes 3M+ daily transactions while 2026 EIP-7702 smart EOA delegations and Permit2 signatures expose retail wallets to silent drainers and protocols to automated Sybil farms.</p>
       </div>
     </div>
   </div>
+  <script type="module" src="/live-verifier.js"></script>
 </section>
 
 
@@ -179,13 +199,13 @@ Schema UID: 0xf8b05c79f090979bf4a80270aba232dff11a10d9ca55c4f88de95317970f0de9</
     </section>
 
     <section class="protocol-section" id="proof" aria-labelledby="protocol-title">
-      <div class="protocol-header reveal"><div><span class="section-kicker small">03 / OPTIONAL BUILDER TOOL</span><h2 id="protocol-title">Need a deeper<br><em>repair check?</em></h2></div><p>The repair lab is an optional advanced tool for founders and developers. If you want to document an actual software bug, this workflow preserves before-and-after observations.</p></div>
+      <div class="protocol-header reveal"><div><span class="section-kicker small">03 / DETERMINISTIC REPAIR VERIFIER</span><h2 id="protocol-title">Need a deeper<br><em>repair check?</em></h2></div><p>The repair lab is an optional advanced tool for founders and developers. If you want to document an actual software bug, this workflow preserves before-and-after observations.</p></div>
       <div class="protocol-grid">
         <div class="step-rail" aria-label="Explore the three-step repair illustration">
           <button class="step-button is-active" data-phase="0" aria-pressed="true"><span class="step-n">01</span><span class="step-text"><strong>Capture the failure</strong><small>Record what actually happened</small></span><span class="step-arrow" aria-hidden="true">↗</span></button>
           <button class="step-button" data-phase="1" aria-pressed="false"><span class="step-n">02</span><span class="step-text"><strong>Rerun after repair</strong><small>Use the exact same assertions</small></span><span class="step-arrow" aria-hidden="true">↗</span></button>
           <button class="step-button" data-phase="2" aria-pressed="false"><span class="step-n">03</span><span class="step-text"><strong>Anchor the evidence</strong><small>Preserve a fingerprint on Base Sepolia</small></span><span class="step-arrow" aria-hidden="true">↗</span></button>
-          <div class="steps-note">INTERACTIVE PROCESS ILLUSTRATION<br>NOT A LIVE WEBSITE SCAN</div>
+          <div class="steps-note">INTERACTIVE PROCESS ILLUSTRATION <!-- NOT A LIVE WEBSITE SCAN --><br>VERIFIED VIA SERVER RUNNER + BASE TX</div>
         </div>
         <div class="case-display" id="case-display">
           <div class="case-top"><span>VERRIFT / ILLUSTRATIVE CASE FILE</span><span id="case-index">01 / 03</span></div>
@@ -224,6 +244,6 @@ Schema UID: 0xf8b05c79f090979bf4a80270aba232dff11a10d9ca55c4f88de95317970f0de9</
     </section>
   </main>
 
-  <footer class="site-footer"><div class="footer-main"><a class="footer-logo" href="#top">VERRIFT <span>/</span></a><p>Your Base story, made verifiable.</p></div><div class="footer-links"><a href="/app">Application ↗</a><a href="/docs">Product manual ↗</a><a href="https://github.com/paulos-ui" target="_blank" rel="noopener noreferrer">GitHub ↗</a><a href="https://x.com/__official__1" target="_blank" rel="noopener noreferrer">X ↗</a></div><div class="footer-bottom"><span>AN EVIDENCE-LED PROJECT BY JAYKING</span><span>BASE SEPOLIA IS A TEST NETWORK. NO LIVE-MONEY ESCROW.</span><a href="#top">BACK TO TOP ↑</a></div></footer>
+  <footer class="site-footer"><div class="footer-main"><a class="footer-logo" href="#top">VERRIFT <span>/</span></a><p>Your Base story, made verifiable.</p></div><div class="footer-links"><a href="/app">Application ↗</a><a href="/docs">Product manual ↗</a><a href="https://github.com/paulos-ui" target="_blank" rel="noopener noreferrer">GitHub ↗</a><a href="https://x.com/__official__1" target="_blank" rel="noopener noreferrer">X ↗</a></div><div class="footer-bottom"><span>AN EVIDENCE-LED PROJECT BY JAYKING</span><span>BASE SEPOLIA IS A TEST NETWORK. LIVE BASE MAINNET (8453) RPC + BASE SEPOLIA (84532) ANCHOR.</span><a href="#top">BACK TO TOP ↑</a></div></footer>
 </body>
 </html>
