@@ -13,7 +13,7 @@
   <link rel="icon" type="image/svg+xml" href="/mark.svg">
   <link rel="stylesheet" href="/landing.css">
   <script type="module" src="/landing.js"></script><script type="module" src="/public-inspector.js"></script>
-  <link rel="stylesheet" href="/passport.css"><link rel="stylesheet" href="/ui-v8.css"><link rel="stylesheet" href="/ui-v10.css"><link rel="stylesheet" href="/ui-2026.css">
+  <link rel="stylesheet" href="/passport.css"><link rel="stylesheet" href="/ui-v8.css"><link rel="stylesheet" href="/ui-v10.css"><link rel="stylesheet" href="/ui-2026.css"><link rel="stylesheet" href="/ui-v11.css"><script type="module" src="/landing-scan.js"></script>
 </head>
 <body class="landing-page">
   <a class="skip-link" href="#main">Skip to content</a>
@@ -88,7 +88,11 @@
       </div>
     </section>
 
-    <section class="v10-landing-token reveal" aria-label="Public Base token research"><div><span class="section-kicker">NEW / TOKEN RESEARCH</span><h2>Unknown token?<br><em>Start with evidence.</em></h2><p>Investigate an exact Base contract for reported sell restrictions, source-code controls, token taxes and available pool liquidity. The result is not a promise of safety or a recommendation to buy.</p></div><a href="/verify#token">Research any Base token ↗</a></section>
+    <section class="v11-live-scan reveal" id="live-scan" aria-labelledby="v11-live-title">
+  <div class="v11-scan-description"><span class="section-kicker">PUBLIC / BASE MAINNET / NO WALLET REQUIRED</span><h2 id="v11-live-title">One contract.<br><em>A clearer decision.</em></h2><p>Before interacting with an unfamiliar token, inspect its deployed contract, available sell simulation, privileged controls and pool liquidity. Each result shows where the evidence came from.</p><div class="v11-scan-steps"><span>01 / CHECK</span><span>02 / REVIEW THE UNKNOWN</span><span>03 / SAVE AND RECHECK</span></div><p class="v11-scan-caveat">No automated tool can guarantee that a token is safe. Unavailable checks remain unavailable rather than becoming a passing grade.</p></div>
+  <div class="v11-live-console"><div class="v11-console-head"><span>VERRIFT / LIVE CONTRACT RESEARCH</span><span><i aria-hidden="true"></i> BASE / 8453</span></div><form id="v11-landing-form"><label for="v11-landing-address">PASTE BASE ERC-20 CONTRACT</label><input id="v11-landing-address" name="address" pattern="0x[0-9a-fA-F]{40}" maxlength="42" placeholder="0x..." required spellcheck="false" autocomplete="off"><button type="submit">Scan this token <span aria-hidden="true">↗</span></button><button type="button" id="v11-example-contract" class="v11-example-contract">Try a real example: Circle USDC on Base ↗</button></form><div id="v11-landing-result" aria-live="polite" role="status"><p>Research begins here. No connection, approval or purchase.</p></div><p class="v11-data-note">Live observations from independent services and Base RPC. Coverage and timing vary.</p></div>
+ </section>
+    <section class="v11-why-different reveal" aria-label="What makes VERRIFT different"><span>ONE-TIME SCANNERS SHOW A MOMENT. VERRIFT HELPS YOU REVISIT IT.</span><p>Save a dated Base token research record, share the exact observations, and check again to see what sources report differently. Then review wallet permissions and verify a confirmed change. VERRIFT does not claim that disappearing warnings mean a contract was repaired.</p><a href="/verify#token">Explore the evidence desk ↗</a></section>
     <section class="v8-inspector reveal" id="inspector" aria-labelledby="v8-inspector-title">
       <div class="v8-inspector-lead"><p class="section-kicker">BASE MAINNET / REAL READS</p><h2 id="v8-inspector-title">The truth is<br><em>onchain.</em></h2><p>Explore an address instantly. No wallet connection needed to read public balances. Connect inside VERRIFT to prove wallet ownership and check permissions.</p></div>
       <form id="v8-public-form" class="v8-search-form"><label for="v8-address">BASE WALLET ADDRESS</label><div><input id="v8-address" name="address" placeholder="0x…" required pattern="0x[0-9a-fA-F]{40}" maxlength="42" autocomplete="off" spellcheck="false"><button type="submit">Inspect address ↗</button></div><small>Only public Base Mainnet reads. No risk score or wallet-safety certification.</small></form>

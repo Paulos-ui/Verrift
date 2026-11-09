@@ -1,3 +1,17 @@
+# VERRIFT V11 | Scan, Save, Recheck
+
+**Public live scanner:** The landing page now has a read-only Base token contract input. It uses GoPlus, Honeypot.is, DEX Screener and a Base Mainnet RPC `eth_getCode` request. The optional example uses the actual Circle-issued Base USDC contract; all findings are requested live, not fabricated. The provider APIs can return incomplete or conflicting results.
+
+**Evidence records:** On `/verify`, a visitor can save a newly observed scan to the existing Supabase `verrift_state` storage, receive a dated public link and SHA-256 JSON digest, then rescan the same contract and compare provider-reported changes. No wallet connection or transaction is involved. These records are **not immutable onchain attestations**, are retained in a bounded store of 250 scans, and must not be presented as a certificate of token safety or evidence that a warning was resolved. Serverless rate limiting is best effort only.
+
+**New endpoints:** `GET /api/token/check?address=...`, `POST /api/token/scans` with `{ "address": "0x...", "compareTo": "scan_id" }` (the second field optional), and `GET /api/token/scans/:id`. Read-only actions use no account; creation is limited per source IP per function instance. No new Supabase SQL or Vercel environment variables are required. Optional `GOPLUS_ACCESS_TOKEN` and `BASE_MAINNET_RPC` continue to be supported.
+
+**Design:** The high-contrast green and ivory identity and original landing are preserved. The scanner now sits in the public page, and the evidence desk lets users download the archived JSON. The old wallet, points, $VIBES, revocation and advanced repair workflows are unchanged.
+
+**Testing:** `npm run verify` includes mocked provider and chain tests. Live provider availability, production storage, wallet authentication, and real Mainnet actions have not been verified by this archive.
+
+---
+
 # VERRIFT | Base Wallet Clarity (V9)
 
 VERRIFT is an evidence-led Base Mainnet wallet safety application. Users sign in with their wallet, review token permissions, verify actual changes onchain, view their VIBES holdings, and claim free daily VERRIFT Points. The new Overview shows streak status and real VIBES balance side-by-side. A separate Get VIBES section supports optional quoted native ETH to VIBES swaps using the server-side 0x API key. Mainnet spending always requires explicit wallet confirmation. No private keys or custody are involved.
