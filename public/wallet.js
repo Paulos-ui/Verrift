@@ -17,16 +17,24 @@ if (typeof window !== 'undefined') {
  window.dispatchEvent(new Event('eip6963:requestProvider'));
 }
 
-const walletName = p => p?.isRabby ? 'Rabby Wallet' : p?.isCoinbaseWallet ? 'Coinbase Wallet' : p?.isMetaMask ? 'MetaMask' : p?.isBraveWallet ? 'Brave Wallet' : 'Browser wallet';
+const walletName = p => p?.isRabby ? 'Rabby Wallet' : p?.isCoinbaseWallet ? 'Coinbase Wallet' : p?.isBraveWallet ? 'Brave Wallet' : p?.isMetaMask ? 'MetaMask' : 'Browser wallet';
 function discovered() {
- const wallets = [...announced.values()];
- const seen = new Set(wallets.map(item => item.provider));
- const legacy = Array.isArray(window.ethereum?.providers) ? window.ethereum.providers : window.ethereum ? [window.ethereum] : [];
- for (const item of legacy) {
-  if (typeof item?.request !== 'function' || seen.has(item)) continue;
-  wallets.push({id:`legacy-${wallets.length}`,name:walletName(item),provider:item});
-  seen.add(item);
- }
+ // Extensions can publish distinct wrappers through EIP-6963 and window.ethereum.
+ // Prefer the advertised wallet and show only one option per recognized identity.
+ const wallets=[];
+ const seenProviders=new Set();
+ const seenNames=new Set();
+ const add = (candidate) => {
+  if(typeof candidate?.provider?.request!=='function'||seenProviders.has(candidate.provider))return;
+  const identity=String(candidate.name||'Browser wallet').trim().toLowerCase().replace(/[^a-z0-9]/g,'');
+  if(seenNames.has(identity))return;
+  wallets.push(candidate);
+  seenProviders.add(candidate.provider);
+  seenNames.add(identity);
+ };
+ for(const item of announced.values())add(item);
+ const legacy=Array.isArray(window.ethereum?.providers)?window.ethereum.providers:window.ethereum?[window.ethereum]:[];
+ for(const item of legacy)add({id:`legacy-${wallets.length}`,name:walletName(item),provider:item});
  return wallets;
 }
 export async function availableWallets() {

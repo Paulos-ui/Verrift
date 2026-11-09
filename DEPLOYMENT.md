@@ -35,7 +35,7 @@ Configure values in a local `.env` copied from `.env.example`. Do not commit `.e
 - Output: `public`
 - Node: **22.x**
 - Serverless function: `api/index.js` defined in `vercel.json`
-- Environment: `SESSION_SECRET` (at least 32 characters), `PUBLIC_ORIGIN=https://verrift.xyz` (or your true canonical domain), Supabase variables above.
+- Environment: `SESSION_SECRET` (at least 32 characters), `PUBLIC_ORIGIN=https://verrift.xyz` (your canonical domain), Supabase variables above.
 - Optional provider env vars as in `.env.example`. No additional V12 SQL table is required.
 
 ## Post-deployment verification
@@ -53,3 +53,12 @@ Configure values in a local `.env` copied from `.env.example`. Do not commit `.e
 Keep the previous working Git commit before deployment. If V12 regresses, redeploy the previous known-good commit rather than hiding broken scanner states. Public RPC and free providers have quotas, and the current per-instance throttling is not sufficient for abuse-resistant scale. For a future paid API, first deploy durable rate limits, key quotas, privacy terms and stronger monitoring. The new exposure tool is read-only and never calls a transaction sender.
 
 See [README.md](README.md), [METHOD_AND_LIMITS.md](METHOD_AND_LIMITS.md), [BACKER_CASE.md](BACKER_CASE.md), [GITHUB_PUSH.md](GITHUB_PUSH.md).
+
+
+### Wallet sign-in domain fix (V12.1)
+
+The backend now recognizes the verified VERRIFT domains `https://verrift.xyz`, `https://www.verrift.xyz`, and `https://verrift.vercel.app`, while rejecting cross-site write requests. Sign-in challenge messages use the **current trusted domain** instead of using an unrelated hostname from `PUBLIC_ORIGIN`. For any other domain you control, add its exact HTTPS origin to `ALLOWED_ORIGINS` in Vercel. Do not use `*` or disable the origin check.
+
+In Vercel Production environment variables set `PUBLIC_ORIGIN=https://verrift.xyz` and redeploy. In Supabase Authentication > URL Configuration, set the Site URL to `https://verrift.xyz` and authorize the exact domains used by your deployment. Keep Authentication > Web3 > Ethereum enabled. If a wallet shows a different domain in its signature request, close the dialog and confirm the browser address.
+
+The wallet picker also removes duplicate MetaMask announcements when EIP-6963 and legacy wallet injection both report the same wallet. A read-only token scan does not require wallet sign-in.
