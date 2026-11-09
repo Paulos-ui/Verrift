@@ -133,3 +133,14 @@ For production, Supabase persistence and Ethereum authentication still must be c
 ## Wallet sign-in troubleshooting
 
 If wallet selection works but Supabase returns HTTP 422 on `/auth/v1/token?grant_type=web3`, see [`WALLET_SIGNIN_FIX.md`](WALLET_SIGNIN_FIX.md). This release distinguishes a disabled Ethereum Web3 provider, an unapproved site URL, and generic authentication rejection.
+
+
+## Why 2026: public thesis (landing page)
+
+The landing page links to Base's March 31, 2026 published network strategy and its May 29, 2026 agentic-economy discussion. Base reported over $17 trillion in stablecoin volume for 2025 and identifies markets, payments, and builders as 2026 priorities. VERRIFT's position is an **inference**, not a claim by Base: as more tokens and applications appear, users need accessible, independent research before interacting and verifiable receipts after permission changes.
+
+Sources: https://blog.base.org/2026-mission-vision-and-strategy and https://www.base.org/blog/the-agentic-economy-is-here. These are external references, not VERRIFT usage or revenue metrics.
+
+The landing page links to the project source at https://github.com/paulos-ui/verrift and also preserves the requested GitHub hub address https://github.com/verrift. The latter is a GitHub user/organization-style address and should be confirmed by the owner before submission.
+
+The token investigator is a **screening tool**, not a security audit or trading recommendation. A missing flag does not prove safety. Any real wallet action requires explicit wallet approval. Daily VERRIFT Points do not represent transferable $VIBES.

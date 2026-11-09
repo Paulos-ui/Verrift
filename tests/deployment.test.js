@@ -88,9 +88,10 @@ test('Local server delivers static landing and workspace independent of the data
   await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
   const origin=`http://127.0.0.1:${server.address().port}`;
   try{
-    const home=await fetch(origin+'/');assert.equal(home.status,200);assert.match(await home.text(),/Your wallet/);
+    const home=await fetch(origin+'/');assert.equal(home.status,200);assert.match(await home.text(),/Check before/);
     const app=await fetch(origin+'/app');assert.equal(app.status,200);assert.match(await app.text(),/id="wallet-button"/);
     const stylesheet=await fetch(origin+'/landing.css');assert.equal(stylesheet.status,200);assert.match(stylesheet.headers.get('content-type'),/text\/css/);
+    const momentStyles=await fetch(origin+'/ui-2026.css');assert.equal(momentStyles.status,200);assert.match(momentStyles.headers.get('content-type'),/text\/css/);
     const script=await fetch(origin+'/landing.js');assert.equal(script.status,200);assert.match(script.headers.get('content-type'),/javascript/);
   }finally{await new Promise(resolve=>server.close(resolve));}
 });

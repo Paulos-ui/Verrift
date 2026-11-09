@@ -30,6 +30,8 @@ test('Unconnected visitors get home and a wallet picker, not the old guest-mode 
 test('Public landing enters app before prompting the user to connect a wallet',async()=>{
  const html=await read('public/index.html');
  assert.match(html,/href="\/app"/);
- assert.match(html,/CONNECT WALLET TO START/);
+ assert.match(html,/href="\/app"/);
+ assert.match(html,/Check a Base token/);
+ assert.match(html,/READ-ONLY TOKEN CHECKS ARE PUBLIC/);
  assert.doesNotMatch(html,/WALLET OPTIONAL FOR GUESTS|NO WALLET NEEDED TO EXPLORE/);
 });

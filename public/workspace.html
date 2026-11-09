@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#ffffff"><meta name="description" content="VERRIFT. Check Base token permissions, understand them, and verify your onchain actions."><title>VERRIFT | Base Wallet Clarity</title><meta property="og:title" content="VERRIFT | Base Wallet Clarity"><meta property="og:description" content="Understand your token permissions. Verify changes on Base Mainnet."><meta property="og:type" content="website"><meta name="twitter:card" content="summary_large_image"><meta property="og:image" content="https://verrift.vercel.app/og-wallet.png"><meta name="twitter:image" content="https://verrift.vercel.app/og-wallet.png"><link rel="icon" type="image/svg+xml" href="/mark.svg"><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/ui-v5.css"><link rel="stylesheet" href="/ui-v6.css"><link rel="stylesheet" href="/passport.css"><link rel="stylesheet" href="/ui-v8.css"><link rel="stylesheet" href="/ui-v9.css"><script type="module" src="/app.js"></script></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#ffffff"><meta name="description" content="VERRIFT. Check Base token permissions, understand them, and verify your onchain actions."><title>VERRIFT | Base Wallet Clarity</title><meta property="og:title" content="VERRIFT | Base Wallet Clarity"><meta property="og:description" content="Understand your token permissions. Verify changes on Base Mainnet."><meta property="og:type" content="website"><meta name="twitter:card" content="summary_large_image"><meta property="og:image" content="https://verrift.vercel.app/og-wallet.png"><meta name="twitter:image" content="https://verrift.vercel.app/og-wallet.png"><link rel="icon" type="image/svg+xml" href="/mark.svg"><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/ui-v5.css"><link rel="stylesheet" href="/ui-v6.css"><link rel="stylesheet" href="/passport.css"><link rel="stylesheet" href="/ui-v8.css"><link rel="stylesheet" href="/ui-v9.css"><link rel="stylesheet" href="/ui-v10.css"><script type="module" src="/app.js"></script></head>
 <body>
 <div class="shell">
  <aside class="rail" aria-label="Primary navigation">
@@ -13,18 +13,19 @@
     <button type="button" data-view="profile" class="nav-item"><span class="nav-icon">✳</span> <span class="nav-desktop">Profile &amp; streak</span><span class="nav-mobile">Profile</span></button>
     <button type="button" data-view="cases" class="nav-item"><span class="nav-icon">⌁</span> <span class="nav-desktop">Repair lab</span><span class="nav-mobile">Lab</span> <span id="case-counter" class="nav-count">0</span></button>
     <button type="button" data-view="domains" class="nav-item"><span class="nav-icon">◎</span> <span class="nav-desktop">Verified sites</span><span class="nav-mobile">Sites</span></button>
-    <a href="/verify" class="nav-item"><span class="nav-icon">⊞</span> <span class="nav-desktop">Verify receipt</span><span class="nav-mobile">Proof</span> <span class="nav-arrow">↗</span></a>
+    <a href="/verify#token" class="nav-item"><span class="nav-icon">⊞</span> <span class="nav-desktop">Token &amp; proof check</span><span class="nav-mobile">Check</span> <span class="nav-arrow">↗</span></a>
     <a href="/docs" class="nav-item"><span class="nav-icon">◫</span> <span class="nav-desktop">Product manual</span><span class="nav-mobile">Docs</span> <span class="nav-arrow">↗</span></a>
    </nav>
    <div class="rail-foot"><div class="shift"><span class="pulse" aria-hidden="true"></span> SHIFT 02 / LIVE BUILD</div><p>Proof over promises.<br>Every result has a source.</p><a class="rail-link" href="https://basescan.org" target="_blank" rel="noopener noreferrer">Base Mainnet explorer ↗</a><a class="rail-link" href="/admin" id="admin-link" hidden>Operator console ↗</a><button type="button" id="logout" class="text-action" hidden>Sign out</button></div>
  </aside>
  <div class="app-body">
   <header class="topbar"><div class="mobile-brand">VERRIFT <span class="small-accent">/</span></div><div class="crumb"><a href="/" title="Visit public home">HOME ↗</a> &nbsp; WORKSPACE <span>/</span> <strong id="crumb-view">OVERVIEW</strong></div><div class="topbar-right"><span class="network-pill">● BASE <i>MAINNET INSIGHTS</i></span><button type="button" id="wallet-button" class="wallet-button">Connect wallet <span>↗</span></button></div></header>
+  <div id="v10-activity-bar" class="v10-activity-bar" aria-label="Daily check-in and VIBES balance" hidden></div>
   <main id="content" tabindex="-1" aria-live="polite"><div class="loader">Loading your workspace...</div>
 
 
 </main>
-  <footer class="main-footer"><span>VERRIFT / EVERY FIX LEAVES EVIDENCE.</span><span>BUILD BY JAYKING · <a href="https://github.com/paulos-ui" target="_blank" rel="noopener">GITHUB ↗</a></span></footer>
+  <footer class="main-footer"><span>VERRIFT / EVERY FIX LEAVES EVIDENCE.</span><span>BUILD BY JAYKING · <a href="https://github.com/paulos-ui/verrift" target="_blank" rel="noopener noreferrer">GITHUB ↗</a></span></footer>
  </div>
 </div>
 <div id="toast" role="status" aria-live="polite" class="toast" hidden></div>

@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "VERRIFT — evidence-led repair verification and Base Sepolia rewards",
+  "description": "VERRIFT: Base token due diligence, wallet allowance intelligence, and verifiable permission changes",
   "engines": {
     "node": ">=22"
   },
