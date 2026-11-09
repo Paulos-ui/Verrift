@@ -1,17 +1,17 @@
-# VERRIFT V8 | Update paulos-ui/verrift from WSL
+# VERRIFT V9: update the existing paulos-ui/verrift repository
 
-Download `verrift-signal-room-v8.zip` to the Windows Desktop. From WSL Ubuntu run:
+Save `verrift-mainnet-v9.zip` to your Windows Desktop. Use **WSL**, not Git Bash:
 
 ```bash
 cd "/mnt/c/Users/MY PC/Desktop/verrift"
-unzip -oq "/mnt/c/Users/MY PC/Desktop/verrift-signal-room-v8.zip" -d .
+unzip -oq "/mnt/c/Users/MY PC/Desktop/verrift-mainnet-v9.zip" -d .
 rm -f server.js
 npm ci
 npm run verify
 git status --short
 git add -A
-git commit -m "Upgrade VERRIFT wallet safety and VIBES utility"
+git commit -m "Add VIBES swap quotes, mainnet proof and daily check-in cards"
 git push origin HEAD
 ```
 
-The `-d .` target overwrites into the **existing** folder without replacing `.git`. Do not run `git init` again. Do not add `.env` or keys to GitHub. Once pushed, confirm Vercel is using the newest commit and production environment variables are saved. Full instructions in `DEPLOYMENT.md`.
+This preserves `.git`, supersedes matching files, and relies on your existing GitHub to Vercel integration. Do not upload a `.env` or any secret. A GitHub push is not proof of a live functional swap: verify Vercel environment settings and quote availability after deployment.

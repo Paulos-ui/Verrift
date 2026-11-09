@@ -57,3 +57,7 @@ No additional frontend dependencies are required. The white theme is implemented
 
 - This public homepage is a separate static frontend; it requires no API or Supabase to load. The real workspace uses server APIs and needs the Vercel environment/database setup.
 - No live Base transfer, Anthropic call, or Supabase connection was made during this UI implementation.
+
+## V9 visual extension
+
+A compact two-up claims ribbon sits above the Wallet Passport. Forest green means owned activity/streak; soft mint and white represent Base token holdings. One unobtrusive Get VIBES menu item provides the optional transaction flow. The quotation card has separated input, expected output, slippage, route, and explicit confirmation states. Do not show fabricated APR, price charts, daily reward yields or artificial volume.

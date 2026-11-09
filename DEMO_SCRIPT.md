@@ -1,13 +1,20 @@
-# VERRIFT V7 | Hackathon walkthrough (about 70 seconds)
+# VERRIFT V9 | 70-second demo
 
-**0 to 10s**: "Most Base wallets have a history, but few people understand it. This is VERRIFT, your Base Wallet Passport."
+Open `https://verrift.vercel.app` and scroll to show the Base permission message.
 
-**10 to 22s**: Open the public landing, click Explore your Base wallet, choose MetaMask or another detected wallet and sign the free login message. Show the congratulations dialog. The signature proves wallet control, not financial trustworthiness.
+**0-10 seconds**
+"What can your wallet approve, and how do you know what actually changed? I built VERRIFT, a Base tool that turns onchain activity and permissions into evidence you can understand."
 
-**22 to 40s**: Show real Base Mainnet balance and outgoing account nonce. If Blockscout is configured, point to the recent transactions and repeated counterparties. Tell judges these are sampled native ETH movements, not lifetime spending.
+**10-27 seconds**
+"I connect my wallet with a free signature. My overview shows real Base activity, the actual VIBES balance, and a daily check-in. VERRIFT Points are free profile points, not tokens."
 
-**40 to 58s**: Click Generate my receipt. Show the server-generated SHA-256 fingerprint, then Download branded card. Click Share to X to open the draft, without posting automatically.
+**27-45 seconds**
+"In Safety Desk, I inspect a real token-spender allowance. I decide whether to revoke it. If I sign a revocation, VERRIFT checks the confirmed Base transaction and the current allowance before it calls the change verified."
 
-**58 to 70s**: Optionally show a previously verified Base Sepolia self-transaction receipt, or perform one with testnet funds if available. Explain that the original Proof-of-Fix repair lab remains an advanced tool for developers.
+**45-58 seconds**
+"The Get VIBES panel is optional. It requests a live 0x quote, shows my estimated and minimum VIBES, and asks me to review any real Mainnet trade in my own wallet. No automatic swap and no custodial funds."
 
-Never pretend a testnet proof is a mainnet transaction or use fabricated wallet balances during a public demo. If an indexed data service is unavailable, show the real RPC fields and explain the limitation.
+**58-70 seconds**
+"Verified proof can be inspected publicly. This is VERRIFT: clearer permissions, deliberate actions, and real evidence on Base. Try it at verrift.vercel.app."
+
+Only demonstrate a swap receipt if a real trade was voluntarily executed and independently confirmed. Do not imply that buying VIBES gives guaranteed daily token rewards.

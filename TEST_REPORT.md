@@ -1,8 +1,13 @@
-# V7 verification report
+# VERRIFT V9 | Test results
 
-- `npm run verify`: executed with Node 22; all 48 automated tests passed. Includes wallet data summarization, right-chain checks, unconfigured-indexer fallback, wallet-auth gates, forged snapshot rejection, proof confirmation and per-user isolation.
-- `npm run build`: passed its JS syntax and JSON validation. **This does not compile TypeScript.**
-- Static Chromium visualization: dashboard at 1440, 768 and 390 pixels. No horizontal overflow and no page exceptions. The landing was also rendered at 1440 and 390 pixels without overflow or page exceptions.
-- External service validation: **not executed live** for Supabase auth, Anthropic, Blockscout, Base RPC, and onchain transaction confirmation. All service-related API tests were controlled or mocked.
-- The X share draft is user-initiated. It does not automatically post or attach an image. Users can download a PNG card and attach it manually. The shared VERRIFT URL has an Open Graph image.
-- This release changes the primary UX to wallet analytics, while retaining older repair-related features and their existing tests.
+**Local automated suite:** 62/62 tests passed (`npm run verify`).
+
+**Static/browser visualization:** Chromium rendered V9 wallet overview and Get VIBES screens with mock account data at 390, 768 and 1440 px. No horizontal overflow or uncaught JavaScript errors were observed. Browser captures were made from static preview HTML, not from your deployed production server or an authenticated real wallet.
+
+**Local HTTP smoke:** GET `/`, `/app`, `/ui-v9.css`, `/healthz`, and `/api/status` each returned HTTP 200. An unauthenticated swap POST returned HTTP 401. This is the correct access boundary.
+
+**New test coverage:** strict ETH amount parsing, Base 8453/token pair checks, real quote response validation using mocked 0x, missing API key handling, failed liquidity and mismatched amount rejection, signed quote proof tampering, confirmed receipt and token transfer verification, user isolation and auth gating, UI/wording checks. Earlier owner/domain/sandbox/receipt/Supabase unit tests continue to pass.
+
+**Not verified:** a real quote fetched with your production `ZEROX_API_KEY`; live Base Mainnet swap from an actual wallet; real Blockscout, Supabase, or Anthropic calls in this container; Vercel deployment; performance audit on the real public domain. There is NO funded real VIBES daily reward mechanism.
+
+**Tooling note:** `npm run build` checks JavaScript syntax and JSON. It is not a TypeScript compilation. No claims of independently audited smart contracts are made.

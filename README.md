@@ -1,3 +1,11 @@
+# VERRIFT | Base Wallet Clarity (V9)
+
+VERRIFT is an evidence-led Base Mainnet wallet safety application. Users sign in with their wallet, review token permissions, verify actual changes onchain, view their VIBES holdings, and claim free daily VERRIFT Points. The new Overview shows streak status and real VIBES balance side-by-side. A separate Get VIBES section supports optional quoted native ETH to VIBES swaps using the server-side 0x API key. Mainnet spending always requires explicit wallet confirmation. No private keys or custody are involved.
+
+**IMPORTANT:** VERRIFT Points are NOT $VIBES tokens, have no promised conversion or cash value, and no funded real-token rewards exist in this release. The legacy repair laboratory and passport testnet anchoring remain optional features, not Mainnet payment flows. No platform guarantees risk-free token transactions.
+
+**V9 source and setup:** See [V9_RELEASE.md](V9_RELEASE.md). Install `ZEROX_API_KEY` on Vercel only when enabling live mainnet swap quotations. Supabase schema is unchanged. Wallet ownership sign-in does not require switching to Base Sepolia; only legacy testnet proof flows do.
+
 ## Wallet Passport (V7 user-first flow)
 
 The main workspace now opens with Base Mainnet wallet activity rather than requiring
@@ -49,7 +57,7 @@ Built by Jayking (`paulos-ui`, [@__official__1](https://x.com/__official__1)) fo
 - Node.js 22+
 - A Supabase project with **Auth -> Web3 -> Ethereum enabled** and your deployment domain configured in the Auth redirect allowlist
 - Supabase Postgres schema from [`supabase/schema.sql`](supabase/schema.sql)
-- A compatible EVM wallet, connected to Base Sepolia (chain 84532) for signed-in functions
+- A compatible EVM wallet; Base Mainnet (chain 8453) for allowance and optional swap transactions
 - Optional Anthropic API key for AI evidence analysis
 
 ## Local setup

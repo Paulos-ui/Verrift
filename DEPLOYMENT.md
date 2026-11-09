@@ -1,3 +1,9 @@
+# V9 Mainnet feature setup
+
+V9 adds `ZEROX_API_KEY` (server-only) for optional 0x Swap API v2 ETH-to-VIBES quotes on Base Mainnet. Deploy the V9 ZIP first and confirm live wallet login, token balance and free daily claim. Only then create an API key at https://dashboard.0x.org/apps and add it to the Vercel Production environment. Redeploy after changes. No new database schema is needed.
+
+No trading will be advertised as available when the API key is absent. No onchain $VIBES claim/reward service is implemented. VERRIFT Points remain nontransferable. Review `V9_RELEASE.md` before live swaps.
+
 # V7 quick update
 
 This release adds wallet-first Base Mainnet analytics and optional Blockscout indexed history. See `V7_RELEASE.md` for the actual user journey and the Vercel environment variables. No new Supabase tables are needed. Wallet proof anchoring remains an optional Base Sepolia action, not a condition of sign-in.

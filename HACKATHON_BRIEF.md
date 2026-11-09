@@ -15,3 +15,7 @@
 **Non-goals:** real-money escrow, production-grade pen-testing, arbitrary visual browsing, full GitHub PR write access and multi-tenant paid SaaS. Those are future-stage developments, not unfinished MVP claims.
 
 **Sources:** user-provided screenshots of https://blog.vibestarter.xyz/vibeathon-02 , Base chain documentation https://docs.base.org/base-chain/api-reference/ethereum-json-rpc-api/eth_chainId , Anthropic Messages API https://docs.anthropic.com/en/api/messages .
+
+## V9 judging narrative
+
+Main value proposition: help Base wallet users understand their permissions, take consent-based action and verify what happened. Additional engagement: free UTC streaks and read-only official VIBES balance. Optional community utility: secure, quoted ETH to VIBES swaps from 0x on Base Mainnet (requires external API key and liquidity). No token distribution is claimed. Source contains AI assistance disclosures.

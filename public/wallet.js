@@ -125,3 +125,22 @@ export async function sendERC20Revoke({owner,token,spender}) {
  const data='0x095ea7b3'+spender.slice(2).toLowerCase().padStart(64,'0')+'0'.repeat(64);
  return provider.request({method:'eth_sendTransaction',params:[{from:owner,to:token,value:'0x0',data}]});
 }
+
+// ETH -> VIBES swap. The signed quote is supplied by VERRIFT server after an actual
+// 0x API response. It must be executed only after deliberate user confirmation.
+export async function executeVibesSwap({owner,quote}) {
+ if(!provider)throw Error('Select the wallet linked to your VERRIFT account.');
+ if(!/^0x[0-9a-f]{40}$/i.test(owner)||!quote?.tx||quote.chainId!==8453)throw Error('Invalid Base Mainnet swap quote.');
+ const accounts=await provider.request({method:'eth_accounts'});
+ if(!accounts?.some(a=>a.toLowerCase()===owner.toLowerCase()))throw Error('Connected wallet differs from the signed-in wallet.');
+ if(Date.now()>Date.parse(quote.quoteExpiresAt))throw Error('Quote expired. Request a fresh quote before swapping.');
+ let chain=String(await provider.request({method:'eth_chainId'})).toLowerCase();
+ if(chain!=='0x2105'){
+  try{await provider.request({method:'wallet_switchEthereumChain',params:[{chainId:'0x2105'}]});}
+  catch(error){if(error.code!==4902)throw error;await provider.request({method:'wallet_addEthereumChain',params:[{chainId:'0x2105',chainName:'Base',nativeCurrency:{name:'Ether',symbol:'ETH',decimals:18},rpcUrls:['https://mainnet.base.org'],blockExplorerUrls:['https://basescan.org']}]});}
+  chain=String(await provider.request({method:'eth_chainId'})).toLowerCase();
+  if(chain!=='0x2105')throw Error('Switch your wallet to Base Mainnet before swapping.');
+ }
+ if(!/^0x[0-9a-f]{40}$/i.test(quote.tx.to)||!/^0x(?:[0-9a-f]{2})+$/i.test(quote.tx.data)||!/^0x[0-9a-f]+$/i.test(quote.tx.value))throw Error('Malformed provider transaction.');
+ return provider.request({method:'eth_sendTransaction',params:[{from:owner,to:quote.tx.to,data:quote.tx.data,value:quote.tx.value}]});
+}

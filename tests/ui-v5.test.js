@@ -34,7 +34,7 @@ test('Visitor navigation and browser title remain correctly branded',async()=>{
  const [landing,workspace]=await Promise.all([read('public/index.html'),read('public/workspace.html')]);
  assert.match(landing,/href="\/app"/);
  assert.match(workspace,/href="\/" aria-label="VERRIFT home"/);
- assert.match(workspace,/<title>VERRIFT \| The Proof-of-Fix Network<\/title>/);
+ assert.match(workspace,/<title>VERRIFT \| Base Wallet Clarity<\/title>/);
  assert.match(workspace,/class="nav-mobile">Sites<\/span>/);
 });
 

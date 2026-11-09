@@ -18,3 +18,15 @@
 - [ ] Verify Base Sepolia proof transaction and reward from connected wallet
 - [ ] Verify final Vercel deployment URL and document it in README
 - [ ] Push latest source to paulos-ui/verrift
+
+## V9 mainnet extension
+
+- [ ] Wallet Overview shows daily claim and real VIBES holdings at top.
+- [ ] Existing Supabase project connected, session and VIBES RPC read working.
+- [ ] `ZEROX_API_KEY` added to Vercel Production if live swaps are needed.
+- [ ] Swap quote shows actual expected/minimum VIBES, with current liquidity.
+- [ ] User confirms transaction separately in wallet and reads receipt.
+- [ ] No claim that a pending swap is completed before Base receipt + VIBES Transfer is verified.
+- [ ] Daily check-in never claims to distribute real VIBES.
+- [ ] $VIBES holder perks explicitly described as independently built VERRIFT features.
+- [ ] All existing testnet proof modules remain labelled testnet.
