@@ -1,38 +1,23 @@
-# VERRIFT V9: update the existing paulos-ui/verrift repository
+# VERRIFT V12 | Deploy the source without losing Git history
 
-Save `verrift-mainnet-v9.zip` to your Windows Desktop. Use **WSL**, not Git Bash:
+Save `VERRIFT-V12-PROOF-AND-BACKER.zip` to your Windows Desktop.
+
+Run in WSL Ubuntu (the existing repository remains at `C:\Users\MY PC\Desktop\verrift`):
 
 ```bash
 cd "/mnt/c/Users/MY PC/Desktop/verrift"
-unzip -oq "/mnt/c/Users/MY PC/Desktop/verrift-mainnet-v9.zip" -d .
+unzip -oq "/mnt/c/Users/MY PC/Desktop/VERRIFT-V12-PROOF-AND-BACKER.zip" -d .
 rm -f server.js
 npm ci
 npm run verify
 git status --short
 git add -A
-git commit -m "Add VIBES swap quotes, mainnet proof and daily check-in cards"
+git commit -m "Add same-block Base permission evidence and product strategy"
 git push origin HEAD
 ```
 
-This preserves `.git`, supersedes matching files, and relies on your existing GitHub to Vercel integration. Do not upload a `.env` or any secret. A GitHub push is not proof of a live functional swap: verify Vercel environment settings and quote availability after deployment.
+The ZIP is source-only and does **not** contain `.git` or `.env`. It overwrites matching source files **in place** without changing remotes or existing Git history. The `rm -f server.js` command removes a legacy server entry that otherwise conflicts with the current Vercel layout. Never force push, delete `.git`, or commit API credentials.
 
+Your established source path is `https://github.com/paulos-ui/verrift`. The supplied `https://github.com/verrift` link is an account or organization-style URL, not itself a repo URL. Confirm ownership before using it as your submission's GitHub source field.
 
-## V10 2026 update
-
-Save the new ZIP to your Windows Desktop, then in WSL run:
-
-```bash
-cd "/mnt/c/Users/MY PC/Desktop/verrift"
-unzip -oq "/mnt/c/Users/MY PC/Desktop/verrift-v10-2026.zip" -d .
-rm -f server.js
-npm ci
-npm run verify
-git status --short
-git add -A
-git commit -m "Explain why Base wallet clarity matters in 2026"
-git push origin HEAD
-```
-
-This preserves the existing `.git` folder. Do not commit local `.env` files.
-
-**Link note:** `https://github.com/verrift` was provided as a GitHub address, but it is not a conventional `owner/repository` path. The established repository is `https://github.com/paulos-ui/verrift`. Both are linked in the footer for review; verify the short link before a submission.
+After push, check the real Vercel deployment. A successful push or 82 passing mocked tests **does not establish** that live token providers, the new permission endpoint, Supabase, wallet signing, or swaps actually work in production.

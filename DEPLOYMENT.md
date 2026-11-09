@@ -1,117 +1,55 @@
-# V9 Mainnet feature setup
+# VERRIFT V12 | Vercel + Supabase deployment
 
-V9 adds `ZEROX_API_KEY` (server-only) for optional 0x Swap API v2 ETH-to-VIBES quotes on Base Mainnet. Deploy the V9 ZIP first and confirm live wallet login, token balance and free daily claim. Only then create an API key at https://dashboard.0x.org/apps and add it to the Vercel Production environment. Redeploy after changes. No new database schema is needed.
+This is the current deployment guide. Historical fixes are archived under `docs/releases/`.
 
-No trading will be advertised as available when the API key is absent. No onchain $VIBES claim/reward service is implemented. VERRIFT Points remain nontransferable. Review `V9_RELEASE.md` before live swaps.
+## Requirements
 
-# V7 quick update
+- Node.js 22+, a GitHub repository under a confirmed account you control, and a Vercel project.
+- Supabase project for authenticated wallet state and retained research reports.
+- Base Mainnet RPC; defaults to `https://mainnet.base.org` for the same-block permission tool.
+- Optional `ZEROX_API_KEY` for real ETH-to-VIBES quotes, `BLOCKSCOUT_API_KEY` for indexed activity, `ANTHROPIC_API_KEY` for bounded AI analysis, `GOPLUS_ACCESS_TOKEN` for authenticated GoPlus access.
 
-This release adds wallet-first Base Mainnet analytics and optional Blockscout indexed history. See `V7_RELEASE.md` for the actual user journey and the Vercel environment variables. No new Supabase tables are needed. Wallet proof anchoring remains an optional Base Sepolia action, not a condition of sign-in.
-
-# VERRIFT | GitHub, Supabase and Vercel deployment
-
-> **Updated deployment layout:** For fixes to the November 7 Vercel `FUNCTION_INVOCATION_FAILED`, follow `VERCEL_HOTFIX.md` first. The old root-level `server.js` must be removed from already-extracted repositories, because unzip does not remove old files. The local server now lives at `scripts/dev-server.js`; production uses `api/index.js` and `public/`.
-
-## 1. Source on your Windows Desktop
-
-The project is extracted into `/mnt/c/Users/MY PC/Desktop/verrift` in WSL Ubuntu. The ZIP below is source-only and does not include `.env`, databases, wallets, or generated artifacts.
+## Local validation
 
 ```bash
-cd "/mnt/c/Users/MY PC/Desktop"
-unzip -oq "verrift-vercel-hotfix.zip" -d "verrift"
-rm -f "verrift/server.js"
-cd "verrift"
 npm ci
+npm run setup
 npm run verify
+npm run dev
 ```
 
-## 2. Push to paulos-ui
+Configure values in a local `.env` copied from `.env.example`. Do not commit `.env` or any API secrets. `npm run setup` can generate a random `SESSION_SECRET`. Basic public token reads can function without wallet login; authenticated user paths require Supabase configuration. For development, local state is not production persistence.
 
-Create an empty PUBLIC repo called `verrift` at https://github.com/new under your GitHub account, unless it already exists.
+## Supabase configuration
 
-If the directory is already a Git repo linked to `paulos-ui/verrift`:
+1. Open SQL Editor and apply `supabase/schema.sql` (server-managed state table and atomic update routine).
+2. Enable **Authentication > Providers > Web3 > Ethereum** for signed wallet login.
+3. Allow the exact Vercel domain in Supabase URL configuration and redirect allowlist. Include localhost while developing.
+4. Provision `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY` on the **server**. The secret must never appear in `public/` or a browser response.
 
-```bash
-cd "/mnt/c/Users/MY PC/Desktop/verrift"
-git status --short
-# Confirm .env is not tracked
-git add -A
-git commit -m "Add public wallet accounts and Supabase storage"
-git push origin HEAD
-```
-
-For a new repo only:
-
-```bash
-git init
-git branch -M main
-git remote add origin https://github.com/paulos-ui/verrift.git
-git add -A
-git commit -m "Launch public VERRIFT with wallet workspaces"
-git push -u origin main
-```
-
-Do not overwrite `.git`, force-push or share API secrets.
-
-## 3. Add Supabase on Vercel
-
-**Read `VERCEL_DATABASE_NEXT.md` for the current API error and SQL Editor steps.**
-
-**Yes. Choose Supabase, not Redis, to power individual user accounts and their persisted cases.**
-
-- Open Vercel > `verrift` > Storage/Marketplace/Integrations > Add Supabase.
-- Connect a Supabase project to the Vercel project.
-- In Supabase SQL Editor run `supabase/schema.sql` once.
-- Supabase Authentication > Providers > Web3 (Ethereum): Enable.
-- Supabase Authentication > URL configuration: set Site URL to your Vercel domain; add `https://YOUR-URL/**` redirect allowlist. For local development, also allow `http://localhost:3000/**`.
-
-Make sure Vercel Environment Variables includes the following database variables. These will generally be created by the integration:
-
-| Env name | Value | Required |
-| --- | --- | --- |
-| `SUPABASE_URL` | Supabase project URL | Yes (or `NEXT_PUBLIC_SUPABASE_URL`) |
-| `SUPABASE_PUBLISHABLE_KEY` | `sb_publishable_...` API key | Yes (or `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`) |
-| `SUPABASE_SECRET_KEY` | Server-only `sb_secret_...` key | Yes (legacy: `SUPABASE_SERVICE_ROLE_KEY`) |
-
-These three are consumed on the **server**, even if the URL and publishable key have `NEXT_PUBLIC` prefixes supplied by the integration. The secret must NEVER be public.
-
-## 4. Add the remaining Vercel variables manually
-
-| Env name | Value |
-| --- | --- |
-| `SESSION_SECRET` | Long randomly generated secret from `npm run setup`, at least 32 characters |
-| `ANTHROPIC_API_KEY` | Your private Anthropic API key, required to use Claude analysis |
-| `CLAUDE_MODEL` | `claude-sonnet-4-6` |
-| `BASE_SEPOLIA_RPC` | `https://sepolia.base.org` |
-| `PUBLIC_ORIGIN` | Your exact Vercel origin, e.g. `https://verrift.vercel.app` if assigned |
-| `ADMIN_WALLET_ADDRESS` | Optional: **your own wallet address** for `/admin`, not a password |
-
-You do **not** need `ADMIN_PASSWORD`, `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`, `DATABASE_URL`, wallet private keys or browser-exposed Anthropic keys.
-
-## 5. Vercel project configuration
+## Vercel settings
 
 - Framework preset: **Other**
-- Root Directory: `./`
+- Root: `./`
 - Build: `npm run build`
-- Output Directory: `public`
-- Node: `22.x`
-- The static site is served from `public/` and Vercel uses the `api/index.js` serverless function. `vercel.json` routes `/api/*`, `/docs`, `/sandbox`, `/admin`, and `/report/*`. Root `server.js` must **not** exist.
+- Output: `public`
+- Node: **22.x**
+- Serverless function: `api/index.js` defined in `vercel.json`
+- Environment: `SESSION_SECRET` (at least 32 characters), `PUBLIC_ORIGIN=https://verrift.xyz` (or your true canonical domain), Supabase variables above.
+- Optional provider env vars as in `.env.example`. No additional V12 SQL table is required.
 
-Save, deploy, then open the actual Vercel URL. The static landing is at `/` and the user dashboard is at `/app`. If you need to set `PUBLIC_ORIGIN` after deployment assigns the URL, set the variable and redeploy.
+## Post-deployment verification
 
-## 6. Validate the REAL deployed product
+1. `GET /healthz` returns `ok: true`.
+2. `GET /api/status` shows correct configured persistence and no false token-reward entitlement.
+3. `GET /api/token/check?address=0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913` returns a live report or explicit provider-unavailable error; never a canned “safe” rating.
+4. Use `/verify#exposure` with known, legitimate public owner/token/spender addresses. Record the block/hash and cross-check against an independent Base RPC or explorer.
+5. Save a research snapshot, copy the public link, reload, rescan and compare. This proves whether production storage is configured.
+6. Test wallet authentication and state isolation independently. Do not attempt spending or revocation unless intentionally approved by the wallet owner.
+7. If 0x is enabled, test quote/error states, slippage, confirmation, and final verification with risk controls; there is no automatically funded token rewards mechanism.
 
-1. Open `/` in a private browser: public animated landing loads without an admin password; CTA goes to `/app`.
-2. On `/app`, choose Connect wallet and select an installed provider. Approve the Base Sepolia switch and wallet ownership signature.
-3. As Wallet A, create a controlled test case, introduce a fault, record failure, restore, and verify. As Wallet B, confirm Wallet A's private records are not visible.
-4. From `/app`, choose **Connect wallet**, select a detected provider, approve the Base Sepolia network and the sign-in signature (not a transaction). Verify that the private dashboard loads.
-5. Open the app with a different wallet. Confirm it does not show the first account's projects/cases.
-6. Register a public domain you own, publish DNS TXT or HTTPS file proof, then verify ownership.
-7. Configure Anthropic and record a **live** Claude analysis on a case with observations.
-8. From your signed-in Base Sepolia wallet, anchor proof in a real transaction; verify its explorer receipt.
-9. Configure and verify a non-custodial test ETH payout after a failed-to-passed repair.
-10. If your wallet is configured as `ADMIN_WALLET_ADDRESS`, open `/admin` for operator counts. Other users receive 403 for its private API.
+## Rollback, limits and safety
 
-## Limitations
+Keep the previous working Git commit before deployment. If V12 regresses, redeploy the previous known-good commit rather than hiding broken scanner states. Public RPC and free providers have quotas, and the current per-instance throttling is not sufficient for abuse-resistant scale. For a future paid API, first deploy durable rate limits, key quotas, privacy terms and stronger monitoring. The new exposure tool is read-only and never calls a transaction sender.
 
-Supabase is a live provider and this development container has no project credentials. Supabase Auth, real onchain transactions, and Vercel deployment MUST be verified by you after connection. Existing records from the single shared admin workspace are not migrated automatically. This MVP uses a single locked JSONB state document and an atomic CAS RPC; high-traffic scale needs relational tables and durable rate limiting.
+See [README.md](README.md), [METHOD_AND_LIMITS.md](METHOD_AND_LIMITS.md), [BACKER_CASE.md](BACKER_CASE.md), [GITHUB_PUSH.md](GITHUB_PUSH.md).

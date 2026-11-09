@@ -1,160 +1,207 @@
-# VERRIFT V11 | Scan, Save, Recheck
+# VERRIFT
 
-**Public live scanner:** The landing page now has a read-only Base token contract input. It uses GoPlus, Honeypot.is, DEX Screener and a Base Mainnet RPC `eth_getCode` request. The optional example uses the actual Circle-issued Base USDC contract; all findings are requested live, not fabricated. The provider APIs can return incomplete or conflicting results.
+### Check before you interact. Know what a spender can access. Verify what changed.
 
-**Evidence records:** On `/verify`, a visitor can save a newly observed scan to the existing Supabase `verrift_state` storage, receive a dated public link and SHA-256 JSON digest, then rescan the same contract and compare provider-reported changes. No wallet connection or transaction is involved. These records are **not immutable onchain attestations**, are retained in a bounded store of 250 scans, and must not be presented as a certificate of token safety or evidence that a warning was resolved. Serverless rate limiting is best effort only.
+[Live application](https://verrift.xyz) · [Public evidence desk](https://verrift.xyz/verify) · [Source repository](https://github.com/paulos-ui/verrift) · [Product manual](https://verrift.xyz/docs)
 
-**New endpoints:** `GET /api/token/check?address=...`, `POST /api/token/scans` with `{ "address": "0x...", "compareTo": "scan_id" }` (the second field optional), and `GET /api/token/scans/:id`. Read-only actions use no account; creation is limited per source IP per function instance. No new Supabase SQL or Vercel environment variables are required. Optional `GOPLUS_ACCESS_TOKEN` and `BASE_MAINNET_RPC` continue to be supported.
+**Status:** working Base Mainnet MVP | **Network:** Base (chain ID `8453`) | **Release:** V12, November 9, 2026 | **License:** MIT
 
-**Design:** The high-contrast green and ivory identity and original landing are preserved. The scanner now sits in the public page, and the evidence desk lets users download the archived JSON. The old wallet, points, $VIBES, revocation and advanced repair workflows are unchanged.
+VERRIFT is an evidence-focused toolkit for users and builders who interact with ERC-20 tokens on Base. It combines **pre-interaction token research**, **one-block permission exposure measurements**, and **post-transaction allowance verification**. The point is not to produce one more arbitrary “safe to buy” score. It is to let someone inspect *what was observed, by which source, at which time or block*, and independently check the effect of a specific wallet-approved action.
 
-**Testing:** `npm run verify` includes mocked provider and chain tests. Live provider availability, production storage, wallet authentication, and real Mainnet actions have not been verified by this archive.
+> **Important:** VERRIFT is an independent builder project. It uses Base network infrastructure; it is **not sponsored, endorsed, audited, funded or otherwise officially backed by Base**. SolNeutral is discussed below only as separate builder experience and a prospective integration use case; there is no confirmed partnership, customer relationship or deployed integration. No source or screenshot claims that VERRIFT has earned revenue or that token holders receive cash rewards.
 
----
+## 60-second demo
 
-# VERRIFT | Base Wallet Clarity (V9)
+1. Open the homepage. Paste the exact Base token contract, or choose the published Circle USDC example. Read the live provider findings and missing-data notices **without connecting a wallet**.
+2. Open **Evidence Desk**. Save a dated scan; copy its public link. Return and run a new scan to see *newly reported* and *no longer reported* flags. A disappearing flag is **not** proof of a security fix.
+3. In **Permission Exposure Lens**, enter a wallet, a token contract and a spender. The server pins all standard ERC-20 balance/allowance and code reads to **one Base block**, and returns the block number/hash, active allowance, a bound on currently held units accessible under that allowance, and an EIP-7702 delegation marker if the wallet bytecode carries one.
+4. In the wallet workspace, optionally connect and sign a login challenge, review observed approvals, prepare an explicit wallet-approved `approve(spender, 0)` transaction, and independently recheck the confirmed transaction on `/verify`. **No funds move without wallet approval.**
 
-VERRIFT is an evidence-led Base Mainnet wallet safety application. Users sign in with their wallet, review token permissions, verify actual changes onchain, view their VIBES holdings, and claim free daily VERRIFT Points. The new Overview shows streak status and real VIBES balance side-by-side. A separate Get VIBES section supports optional quoted native ETH to VIBES swaps using the server-side 0x API key. Mainnet spending always requires explicit wallet confirmation. No private keys or custody are involved.
+**Live evidence, not seeded demo data:** GoPlus, Honeypot.is, DEX Screener, and Base RPC are read at request time. Individual providers can be down, delayed or wrong. The automated test suite uses mocks, not live money transactions.
 
-**IMPORTANT:** VERRIFT Points are NOT $VIBES tokens, have no promised conversion or cash value, and no funded real-token rewards exist in this release. The legacy repair laboratory and passport testnet anchoring remain optional features, not Mainnet payment flows. No platform guarantees risk-free token transactions.
+## The concrete problem
 
-**V9 source and setup:** See [V9_RELEASE.md](V9_RELEASE.md). Install `ZEROX_API_KEY` on Vercel only when enabling live mainnet swap quotations. Supabase schema is unchanged. Wallet ownership sign-in does not require switching to Base Sepolia; only legacy testnet proof flows do.
+Three questions appear at different points in a Base user's journey:
 
-## Wallet Passport (V7 user-first flow)
+| When | Question the user actually needs answered | VERRIFT's observed answer |
+| --- | --- | --- |
+| Before | What should I review before interacting with this exact token contract? | Multiple provider claims, source coverage, liquidity indicators and deployed bytecode observations |
+| During | Has this wallet approved this exact spender, and how much might that approval cover? | Same-block onchain `allowance()` plus `balanceOf()` and account-code observations |
+| After | Did the stated revoke really occur, and is the allowance zero now? | Match the confirmed transaction input and receipt, then independently read the current ERC-20 allowance |
 
-The main workspace now opens with Base Mainnet wallet activity rather than requiring
-visitors to create a developer repair case. After Supabase wallet authentication,
-the app reads the connected wallet's ETH balance and outgoing transaction nonce
-from Base Mainnet RPC (chain 8453). With `BLOCKSCOUT_API_KEY` configured, it
-also reads a bounded page of indexed transactions, sample ETH/gas spending,
-repeated counterparties and recent activity. **These are recent native
-transaction samples, not all-time spending or USD valuations.**
+**Why this is different from a conventional scanner:** We do not claim to outperform specialized detection engines at their own job. Instead, VERRIFT connects **provider-reported research**, **direct chain measurements**, **dated evidence records**, **a specific controlled action**, and **a public check of the resulting chain state**. The distinctions are visible in the response formats and can be reproduced without trusting a branded badge.
 
-Users can generate a server-computed Wallet Passport snapshot with its SHA-256
-digest, optionally anchor that digest in a real zero-value self-transaction on
-Base Sepolia (testnet gas is charged), and export or share a branded,
-privacy-conscious receipt. Wallet-signature authentication proves account
-control, not financial trustworthiness. Anchored receipts require independent
-onchain confirmation and never happen automatically. The repair verification
-module remains under Repair Lab for advanced use.
+This is a product **positioning and technical architecture** advantage, not a proven exclusive moat. Revoke.cash, wallet-native warnings and token screening sites are real alternatives. A long-term competitive advantage would need superior repeat-use workflows, validated user demand and independent adoption, not simply more features.
 
-**New optional secret:** `BLOCKSCOUT_API_KEY`. No schema migration is required;
-wallet passports are stored in the existing `verrift_state` JSON state.
+## Why 2026 is a technical inflection point
 
-# VERRIFT | The Proof-of-Fix Network
+VERRIFT does **not** claim that token approvals or security scanners were impossible in 2023. They were not. The technical environment and the permission problem have evolved:
 
-**Vercel runtime hotfix:** This release separates the static website (`public/`) from the Vercel API (`api/index.js`). The local development server lives in `scripts/dev-server.js`. Before pushing over an older extraction, remove the obsolete root `server.js`. See `VERCEL_HOTFIX.md` for exact WSL instructions and environment settings.
+1. **New native chain cadence.** Base's [November 5, 2026 Denim upgrade](https://www.base.org/blog/denim) introduced five native canonical blocks per second (200 ms blocks), replacing Flashblocks preview streams. A UI stitching together unrelated `latest` reads can accidentally describe different states on a fast chain. VERRIFT's new exposure lens pins contract calls and code checks to the **same specific block** and includes a block hash. That is a reproducibility choice, **not** a claim that a freshly included block is Ethereum-finalized.
+2. **Delegated wallet code.** [EIP-7702](https://eips.ethereum.org/EIPS/eip-7702) enables some externally owned accounts to delegate execution to another contract. That mechanism postdates 2023, and Base [published guidance about its new security considerations in 2025](https://www.base.org/blog/securing-eip-7702-upgrades). VERRIFT now recognizes the `0xef0100 + 20-byte address` delegation-code marker in a direct `eth_getCode` read. It **does not** audit delegate logic, session keys or full smart-account permissions.
+3. **Evolving account abstraction and agent use.** Base [described its Native Account Abstraction work in July 2026](https://www.base.org/blog/native-account-abstraction) and [agent wallet needs in May 2026](https://www.base.org/blog/the-agentic-economy-is-here). More advanced permissions and automated interactions increase the need for an inspectable evidence layer. VERRIFT does **not** claim to support every emerging smart account or agent permission model today.
+4. **Broader adoption, explicitly sourced.** [Base's 2026 strategy](https://www.base.org/blog/2026-mission-vision-and-strategy) reported over $17 trillion of stablecoin volume in 2025 across its ecosystem. This is **a network claim from Base**, not VERRIFT revenue, customer traction or endorsement.
 
-**A public Base Sepolia repair-verification platform with an animated editorial landing page, private wallet workspaces and a wallet-first evidence room.**
+**The actual unlock shipped in V12:** at a particular Base block, VERRIFT can compare token balance and standard spender allowance and look for a delegated wallet code marker. The response is linked to a specific block hash. The broader 2026 roadmap is **context**, not a list of implemented features.
 
-Built by Jayking (`paulos-ui`, [@__official__1](https://x.com/__official__1)) for Vibeathon 02. AI coding assistance was used. Claude (Anthropic) is an optional server-side evidence analyst, not the source of test verdicts.
+## Product capability matrix
 
-## Public landing and workspace
+| Capability | Availability | Trust boundary / limitation |
+| --- | --- | --- |
+| Token contract research | **Shipped**: public, no wallet | Provider-derived flags can be incomplete or contradictory. A successful scan is not an audit. |
+| Save and compare scan reports | **Shipped**: public link and JSON digest | Snapshots live in a bounded server store (up to 250); SHA-256 is not an onchain attestation or durable archive. |
+| Permission Exposure Lens | **Shipped V12**: public, no wallet | Checks **one** owner/token/spender triple at a pinned Base block; `balanceOf`/`allowance` do not guarantee transferability. |
+| EIP-7702 delegation marker | **Shipped V12**: read-only code pattern | Detects a marker, **not** the security of its delegate, session keys or other wallet policies. |
+| ERC-20 allowance sampling | **Shipped**: authenticated workspace | Recent event window only; not a complete history and not Permit2 subpermission enumeration. |
+| Revoke preparation and verification | **Shipped**: wallet-approved action, public receipt check | Gas and user consent required; receipt verification checks exact calldata and current standard allowance. |
+| Wallet Passport and activity | **Shipped**: authenticated wallet workspace | Public balance/nonce; history depends on Blockscout access. Legacy optional Sepolia anchor is not Mainnet token issuance. |
+| Daily streak / VERRIFT Points | **Shipped**: header-level engagement | Points are nontransferable, have no cash value, and are not redeemable for $VIBES. |
+| $VIBES holdings | **Shipped**: real Base contract read | Holdings do not imply VERRIFT is sponsored by the token issuer. |
+| ETH to $VIBES swap | **Conditional**: uses 0x when `ZEROX_API_KEY` is configured | Quotes depend on route/liquidity, real swaps always require the user's wallet and may fail or incur losses. |
+| User alerts / monitoring / enterprise API / SolNeutral integration | **Not shipped** | Planned or possible uses only. No background monitoring, paid plans or partner integrations are live. |
 
-- `/`: premium public introduction with scroll-revealed product narrative, case-file artwork, interactive three-stage **illustration** and a final CTA. It is static, loads without Supabase, and uses no fake data or artificial transaction IDs.
-- `/app`: the wallet-first evidence room, private cases, verified test target, wallet authentication and onchain workflows. This is where the live backend is required.
-- `/docs`: full methodology and limitations. `/sandbox`: observable sample service. `/admin`: wallet-gated operator view.
-- `DESIGN_SYSTEM.md`: visual territories, motion storyboard, and accessibility/performance tradeoffs.
+### How the exposure measurement works
 
-## Experience
+This is a deliberately narrow standard ERC-20 measurement. All relevant calls are read-only:
 
-- **Anyone can explore VERRIFT without signing in.** At `/app`, visitors see a public introduction and can choose an installed wallet. Case creation, controlled test-target changes, private reports, domain registration and Base operations require a wallet-authenticated session. Users must sign an authentication message, not transfer funds, before opening their personal workspace.
-- **Wallet owners** sign an EIP-4361 message to Supabase Auth, which verifies the Ethereum signature and issues an identity. VERRIFT then issues a short-lived secure, HTTP-only session cookie. User workspaces have distinct case records, proof histories and domain registrations. Anonymous visitors cannot create or modify cases. Private records are accessible only through an authenticated wallet session.
-- **Domain owners** verify possession through DNS TXT or HTTPS file challenges before running narrowly scoped, read-only public HTTPS checks.
-- **Claude** reads bounded observations (no private wallet keys) and offers hypotheses, never authoritative pass/fail status.
-- **Base Sepolia** verifies self-addressed SHA-256 proof anchor transactions and non-custodial test ETH reward transfers using transaction receipts. No escrow or mainnet transfers are included.
-- **Share links** are opt-in bearer URLs for public, read-only evidence reports. Without the URL token, private cases are not disclosed.
-- **The operator view** at `/admin` only shows aggregate counts, restricted to the one authenticated wallet configured as `ADMIN_WALLET_ADDRESS`. The public user interface needs no administrator password.
+```text
+GET /api/token/exposure?owner=<WALLET>&token=<ERC20>&spender=<SPENDER>
+  | 1. eth_chainId => require Base Mainnet (8453)
+  | 2. eth_blockNumber => choose B
+  | 3. eth_getBlockByNumber(B) => record B and block hash
+  | 4. eth_call balanceOf(owner) at B
+  | 5. eth_call allowance(owner,spender) at B
+  | 6. eth_getCode(owner) and eth_getCode(spender) at B
+  | 7. optional eth_call decimals() at B
+  v
+  { blockNumber, blockHash, owner, token, spender,
+    balanceRaw, allowanceRaw, potentiallyExposedRaw,
+    activeAllowance, unlimitedAllowance, ownerCode, limits }
+```
 
-## Requirements
+For a standard token, `potentiallyExposedRaw = min(balanceRaw, allowanceRaw)`. This represents **a bounded comparison of reported ERC-20 units**, not an expected loss or maximum value at risk in dollars. With a zero current balance, an existing unlimited allowance still matters for future incoming tokens. Values are shown in raw units if token decimals are unavailable or nonstandard.
 
-- Node.js 22+
-- A Supabase project with **Auth -> Web3 -> Ethereum enabled** and your deployment domain configured in the Auth redirect allowlist
-- Supabase Postgres schema from [`supabase/schema.sql`](supabase/schema.sql)
-- A compatible EVM wallet; Base Mainnet (chain 8453) for allowance and optional swap transactions
-- Optional Anthropic API key for AI evidence analysis
+A returned Base block hash is evidence of what one configured RPC reported. It is **not a cryptographic proof to the user that the server told the truth**; independent clients can verify the block and calls themselves. Onchain finality and token transfer conditions are separate issues.
 
-## Local setup
+## Architecture and APIs
+
+```text
+public/                 Accessible landing, /verify, /app, styles and browser clients
+lib/token-intel.js      Provider scanning, bounded evidence record and report comparison
+lib/exposure.js         Same-block RPC reads + EIP-7702 bytecode marker detection
+lib/wallet-safety.js    Base Mainnet ERC-20 allowance/revoke verification
+lib/vibes-swap.js       Optional wallet-approved 0x ETH -> VIBES quotes and verification
+lib/auth.js             Supabase wallet sign-in and secure session cookies
+lib/store.js            Supabase-backed state, local development fallback
+lib/app.js              HTTP routes, authorization, validation and rate limits
+api/index.js            Vercel function
+supabase/schema.sql     Database initialization
+scripts/, tests/        Local checks and deterministic tests
+```
+
+Public JSON endpoints:
+
+| Endpoint | Purpose | Wallet required? |
+| --- | --- | --- |
+| `GET /api/token/check?address=0x...` | Current provider-backed Base contract check | No |
+| `POST /api/token/scans` | Save fresh research, optionally `compareTo` an earlier `scan_...` | No |
+| `GET /api/token/scans/:id` | Read a retained timestamped scan record | No |
+| `GET /api/token/exposure?owner=...&token=...&spender=...` | Current block-pinned ERC-20 permission exposure | No |
+| `GET /api/verify/revocation?...` | Check exact confirmed revoke and zero current allowance | No |
+| `GET /api/public/scan?address=0x...` | Basic live public wallet overview | No |
+| `GET /api/wallet/approvals` | Sample recent ERC-20 approval events | Yes |
+| `GET /api/wallet/allowance?token=...&spender=...` | Read wallet allowance | Yes |
+| `POST /api/wallet/revoke/verify` | Save a verified signed-in wallet action | Yes |
+
+The public research endpoints are designed for inspection and possible **server-to-server builder pilots**. They are **not a production paid API**: current per-instance rate limiting is best effort and there is no public service-level agreement, partner key issuance or metering. Refer to [BACKER_CASE.md](BACKER_CASE.md) for the business hypothesis and [METHOD_AND_LIMITS.md](METHOD_AND_LIMITS.md) for evidence semantics.
+
+### Integrating with another project
+
+A Base application can call the public endpoint from its own backend to show an allowance preflight and present the limitations verbatim:
+
+```js
+const params = new URLSearchParams({ owner, token, spender });
+const response = await fetch(`https://verrift.xyz/api/token/exposure?${params}`);
+if (!response.ok) throw new Error(`VERRIFT research unavailable: ${response.status}`);
+const { exposure } = await response.json();
+console.log(exposure.blockNumber, exposure.allowanceRaw, exposure.ownerCode);
+```
+
+All inputs are addresses, not passwords or private keys. The endpoint **does not know which permissions are safe**. Never treat `activeAllowance=false` as proof the wallet has no other exposures. Do not retry indefinitely or scrape an unbounded number of addresses. A partner offering automatic scans will need consent, durable rate limits and an explicit data-use policy.
+
+## Developer setup
+
+Requires **Node.js 22+**, a compatible EVM wallet for authenticated features, and **Supabase** for production persistence. There are no npm runtime packages; the project is vanilla JavaScript using Node built-ins and browser APIs.
 
 ```bash
 npm ci
 npm run setup
 npm run dev
-```
-
-Visit http://localhost:3000 for the public landing and http://localhost:3000/app for the workspace. The public site and workspace introduction do not require a wallet. Creating cases, changing the test target and opening private records require one. For wallet authentication, create a Supabase project and add `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY` to `.env`. Run `supabase/schema.sql` in Supabase SQL Editor and allowlist `http://localhost:3000/**` in Supabase Auth redirect URLs.
-
-`npm run setup` generates a private `SESSION_SECRET`. It does **not** generate an administrator password because visitors do not use a shared admin login.
-
-## Production setup: Supabase + Vercel
-
-1. Push the complete repository to `https://github.com/paulos-ui/verrift`.
-2. Import that repo in Vercel, Framework **Other**, root `./`, build `npm run build`, output directory `public`, Node 22.x.
-3. Install the **Supabase** integration in your Vercel project, and ensure `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, and `SUPABASE_SECRET_KEY` are provisioned. Depending on the integration, `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` may be supplied instead. This backend recognizes those aliases. The secret stays server-only.
-4. Open your Supabase dashboard -> SQL Editor. Run the full [`supabase/schema.sql`](supabase/schema.sql) once.
-5. Supabase -> Authentication -> Providers -> enable **Web3 wallet / Ethereum**. In Authentication URL configuration, add `https://YOUR-VERCEL-DOMAIN/**` and set your canonical Site URL.
-6. Add to Vercel manually: `SESSION_SECRET`, `ANTHROPIC_API_KEY` (optional but required for live Claude), `CLAUDE_MODEL=claude-sonnet-4-6`, `BASE_SEPOLIA_RPC=https://sepolia.base.org`, `PUBLIC_ORIGIN=https://YOUR-VERCEL-DOMAIN` and `ADMIN_WALLET_ADDRESS` (optional, your single operator wallet).
-7. Redeploy after adding values. Check `/api/status` returns `persistence: "supabase"`. Test the public entry, wallet selection, authenticated failure-to-repair flow, separate accounts, domain verification, Claude and actual Base Sepolia transactions.
-
-**You do not need Redis/Upstash once Supabase is installed.** Do not add `ADMIN_PASSWORD` or `DATABASE_URL` for this app. `SESSION_SECRET` is *not* a login password. It signs secure sessions. Never put Supabase secret keys, Anthropic keys, or wallet private keys in GitHub or browser code.
-
-## API and trust boundaries
-
-- `GET /api/status`, `GET /api/data` are public; `/api/data` is scoped to the visitor or signed-in user.
-- `GET /api/auth/challenge?address=...`, `POST /api/auth/verify` perform challenge-response authentication via Supabase Web3.
-- `GET /api/data`, `POST /api/cases`, `POST /api/cases/:id/run` and `POST /api/sandbox` require authenticated wallet sessions and enforce per-account ownership.
-- `POST /api/projects`, `/api/projects/:id/verify`, `/api/cases/:id/analyze`, `/api/cases/:id/anchor`, `/api/cases/:id/reward`, and `/api/cases/:id/confirm-payment` require a signed-in wallet.
-- `GET /api/admin/summary` requires the authenticated operator wallet.
-- `GET /api/public/:id?token=...` requires an explicit bearer token created by the owner.
-
-The data store uses a server-only JSONB record in Supabase with an atomic Postgres compare-and-swap routine. This is sufficient for a constrained public MVP but is not a horizontally partitioned multi-tenant database. For a high-traffic production launch, migrate each entity to separate tables, implement per-table RLS, add durable edge-rate-limits and monitoring, conduct full security reviews, and audit any custody or escrow functionality before using real assets.
-
-## Testing
-
-```bash
+# Visit http://localhost:3000
+# Public research: http://localhost:3000/verify
 npm run verify
 ```
 
-Node tests cover domain safety, authenticated case evidence, wallet separation, replay-limited challenges, Base RPC evidence and payouts, and the serverless route adapter. External provider integrations are mocked in tests, so **a passing suite does not mean live Supabase, Anthropic, or Base transactions have succeeded**.
+Copy `.env.example` and provide `SESSION_SECRET` (at least 32 characters), `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`. To enable real wallet login, enable **Supabase Auth > Web3 > Ethereum** and allow your deployment domain. Apply [`supabase/schema.sql`](supabase/schema.sql). The following are optional and must remain server-side: `ANTHROPIC_API_KEY`, `BLOCKSCOUT_API_KEY`, `ZEROX_API_KEY`, `GOPLUS_ACCESS_TOKEN` and `ADMIN_WALLET_ADDRESS`. `BASE_MAINNET_RPC` defaults to the public `https://mainnet.base.org`, which may have availability or rate-limit constraints. `PUBLIC_ORIGIN` should be set to the production hostname.
 
-## Deployment and demo
+### Deploying
 
-- [`DEPLOYMENT.md`](DEPLOYMENT.md) contains an environment checklist and verification plan.
-- [`GITHUB_PUSH.md`](GITHUB_PUSH.md) contains exact WSL unzip, commit and GitHub push commands.
-- [`DEMO_SCRIPT.md`](DEMO_SCRIPT.md) contains a short walkthrough.
-- [`SECURITY.md`](SECURITY.md) documents safety boundaries.
-- [`VERCEL_DATABASE_NEXT.md`](VERCEL_DATABASE_NEXT.md) explains the exact Supabase/Vercel repair steps for the runtime error shown in the user screenshots.
+1. Push the repository to [paulos-ui/verrift](https://github.com/paulos-ui/verrift) or your confirmed owner-controlled repository. The supplied `github.com/verrift` URL is an account/organization-style address and **is not itself a repository clone URL**.
+2. In Vercel select Framework **Other**, root `./`, build command `npm run build`, output directory `public`, Node.js 22+.
+3. Set the required environment variables in Vercel. **Never** put Supabase secret keys or API secrets in the browser, README or Git history.
+4. Connect Supabase and apply the schema. In Supabase enable Ethereum Web3 auth and allow the deployed domain.
+5. Redeploy. Verify `/healthz`, `/api/status`, `/verify`, the new `/api/token/exposure` on a real Base owner/token/spender, and public research scans. Check logged-in workspace separately.
+6. Only if you intend to allow real wallet swaps, configure 0x and deliberately test the quote, approval, confirmation and receipt flows with full understanding of fees and risk.
 
-## License
+Detailed setup and recovery commands: [DEPLOYMENT.md](DEPLOYMENT.md) · [GITHUB_PUSH.md](GITHUB_PUSH.md) · [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md).
 
-MIT. See [`LICENSE`](LICENSE). Keep required contest disclosures accurate.
+## Why a backer or developer would care
 
+**The proposed business is the evidence infrastructure, not a new reward token.** The public scanner demonstrates the data model and helps acquire users. Repeated permission checks and verifiable records could serve wallet applications, dashboards and treasury operations that want explainable, chain-pinned preflight results. The **developer API and monitored report history** are the most plausible future paid capabilities, contingent on user validation, reliability and consent.
 
-## White Room interface refinement (V5)
+- **Users** get free inspectable warnings and targeted allowance checks rather than a paid safety promise.
+- **Builders** could integrate a read-only check before a risky action and provide customers a source-linked audit trail of the check they saw.
+- **Teams/treasuries** could eventually purchase rate-limited API access, monitoring and controlled retention, but **no paid product is live today**.
+- **SolNeutral** is a *separate* Solana-focused builder project discussed as a possible future workflow where research and verification principles might be reusable. VERRIFT currently covers **Base**, not Solana. No actual SolNeutral integration or business backing is claimed.
+- **Base** supplies the public chain, standards and developer ecosystem that VERRIFT uses. That is technical alignment, **not funding, partnership, certification or promotion by Base**.
 
-The public homepage (`/`) now uses a pure-white editorial canvas while retaining its original scroll animation, protocol demonstration, Base proof explanation and enter-app CTA. The user workspace (`/app`) adds a cleaner white navigation rail, a richer but real-data-only overview, clear live sandbox controls, four evidence journey stages and separate contextual activity panels. This describes the historical V5 look. V6 supersedes its white navigation rail and rust accents with pine-green navigation and ocean-blue highlights.
+The exact milestones, costs, revenue assumptions, honest current stage and testable adoption criteria are described in [BACKER_CASE.md](BACKER_CASE.md). There are **no verified paying customers or funding commitments** in this release.
 
-No Supabase schema change or new environment variable is needed for this design update. If `/app` still displays an API configuration warning, finish the database and environment setup described in `VERCEL_DATABASE_NEXT.md`.
+## Milestones with acceptance criteria
 
-## V6 wallet-first flow and visual identity
+| Window | Output | Measurable release gate |
+| --- | --- | --- |
+| **Shipped by Nov 9, 2026** | Read-only Base scanner, dated scan records, same-block exposure reads, EIP-7702 marker, wallet-approved revocation + receipt checks | `npm run verify` passes; public endpoints return real Base data when providers are available |
+| **Days 1–30 (Nov 10–Dec 9)** | Reliable storage/rate limiting, provider uptime dashboard and stronger independent chain verification | Sustained production monitoring with error metrics; no unknown provider failures marked “safe” |
+| **Days 31–60 (Dec 10–Jan 8)** | Opt-in token/permission watchlists and user-requested rechecks; documented integration beta | 5 invited pilot builders **target**, no implied commitments; retention/usage baselines published |
+| **Days 61–90 (Jan 9–Feb 7)** | API key management, metering, billing feasibility and independent security review | Security review findings published, at least 2 paying pilots **target**, otherwise report zero honestly |
 
-The public landing at `/` introduces the concept. `/app` opens a public workspace home with a **Connect wallet** action. The wallet picker lists EIP-6963 or legacy EIP-1193 providers actually detected in the browser, and provides installation links if none are available. After a user chooses a wallet, the app requests Base Sepolia, a login challenge, and a wallet signature verified through Supabase Web3 Auth. Each user's saved cases remain isolated. The account operator route `/admin` is separate.
+These are **future targets, not promises of releases, grants, users or revenue**. No ongoing automatic watch job is running in this version. VERRIFT will only claim milestones that can be reproduced from deployments, code, receipts, support logs and user consent.
 
-V6 uses a deep forest-green navigation rail, white workspace surfaces, ocean-blue typographic accents, and restrained mint highlights. It does not contain an anonymous demo-mode dashboard. The authenticated controlled test target remains available for repeatable failure-to-repair evidence. No real funds or mainnet contracts are involved.
+## Method, security and honest limitations
 
-For production, Supabase persistence and Ethereum authentication still must be configured, including the bundled SQL schema. A Vercel build alone cannot confirm this works.
+- A SHA-256 digest of a saved JSON report helps detect changes in a downloaded document but is **not** a signature, immutable record or finalized onchain proof.
+- Research services may disagree. GoPlus and Honeypot.is can report stale or unsupported data; DEX Screener liquidity can change immediately; Base RPC can rate-limit or be unavailable.
+- A read-only exposure measurement is **not** a token audit, prediction of fraud or proof of ability to sell. A deployed contract might include nonstandard transfer conditions. A spender with allowance cannot necessarily spend the calculated units. An EIP-7702 marker may be legitimate, and its absence does not exclude other delegated or smart-wallet control planes.
+- Revocation verification confirms specific calldata, sender, token, successful receipt and a zero **current** allowance. It does not mean every permission, Permit2 grant, NFT approval or session key has been removed.
+- Saved scan records have bounded retention and may be pruned. Stateless Vercel rate-limit attempts are best effort. Do not treat this as high-assurance public monitoring infrastructure without production hardening.
+- The older repair-lab and optional Base Sepolia passport anchor remain available for their original use case. These are **not** a promise of Mainnet token rewards.
+- Daily VERRIFT Points have **no conversion, redemption or monetary value**. `$VIBES` is a separate third-party token; checking or buying it is not required for the public safety features.
+- Wallet auth uses signed challenges and Supabase Auth; VERRIFT does not ask for seed phrases. Never paste secrets or private keys into token/allowance fields.
 
-## Wallet sign-in troubleshooting
+Security details: [SECURITY.md](SECURITY.md) · [METHOD_AND_LIMITS.md](METHOD_AND_LIMITS.md).
 
-If wallet selection works but Supabase returns HTTP 422 on `/auth/v1/token?grant_type=web3`, see [`WALLET_SIGNIN_FIX.md`](WALLET_SIGNIN_FIX.md). This release distinguishes a disabled Ethereum Web3 provider, an unapproved site URL, and generic authentication rejection.
+## Evidence and validation
 
+- Unit and HTTP endpoint tests cover deterministic token provider normalization, scan records, simulated wallet ownership, revocation verification, optional swap proof, and same-block exposure calls. Run `npm run verify` locally.
+- Test fixtures deliberately simulate chain providers. A passing suite **does not prove the deployed application, live third-party services, Supabase, authenticated wallets or real transactions all work**.
+- Judge demo: start with a **real contract**, perform a public scan, save a dated report, inspect a specific allowance pair, and independently verify a real revoke only if a confirmed transaction exists. Do not invent user counts or demonstrate a successful swap that did not happen.
+- The public interface deliberately leaves coverage and limitations visible. Real-world screenshots and receipts should be collected only after live verification.
 
-## Why 2026: public thesis (landing page)
+See [TEST_REPORT.md](TEST_REPORT.md), [DEMO_SCRIPT.md](DEMO_SCRIPT.md), and [V12_RELEASE.md](V12_RELEASE.md) for release-specific details.
 
-The landing page links to Base's March 31, 2026 published network strategy and its May 29, 2026 agentic-economy discussion. Base reported over $17 trillion in stablecoin volume for 2025 and identifies markets, payments, and builders as 2026 priorities. VERRIFT's position is an **inference**, not a claim by Base: as more tokens and applications appear, users need accessible, independent research before interacting and verifiable receipts after permission changes.
+## Source, project history and disclosure
 
-Sources: https://blog.base.org/2026-mission-vision-and-strategy and https://www.base.org/blog/the-agentic-economy-is-here. These are external references, not VERRIFT usage or revenue metrics.
+Canonical source repository: **https://github.com/paulos-ui/verrift**. The additional supplied account-style address **https://github.com/verrift** needs repository ownership and destination verification before treating it as a clone link. Older V5–V11 release logs remain in `docs/releases/` and the project root for transparency; they are **history**, not current operational documentation.
 
-The landing page links to the project source at https://github.com/paulos-ui/verrift and also preserves the requested GitHub hub address https://github.com/verrift. The latter is a GitHub user/organization-style address and should be confirmed by the owner before submission.
-
-The token investigator is a **screening tool**, not a security audit or trading recommendation. A missing flag does not prove safety. Any real wallet action requires explicit wallet approval. Daily VERRIFT Points do not represent transferable $VIBES.
+Created as an independent hackathon project. Open-source under the [MIT License](LICENSE). Development and feature claims should accurately follow the hackathon rules. No affiliation, investment return, safety guarantee or official ecosystem endorsement is implied.

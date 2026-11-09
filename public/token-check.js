@@ -32,7 +32,7 @@ function reportView(report,{record=null,comparison=null}={}){
  const sources=element('div',undefined,'v10-sources');sources.append(element('strong','SOURCE COVERAGE'));
  for(const source of report.sources||[])sources.append(element('span',`${source.name}: ${source.status}`));outcome.append(sources);
  outcome.append(element('p',report.coverage,'v10-disclaimer'),element('p',report.disclaimer,'v10-disclaimer'));
- const actions=controls(link('BaseScan ↗','https://basescan.org/token/'+report.address),link('DEX Screener ↗','https://dexscreener.com/base/'+report.address));
+ const actions=controls(link('BaseScan ↗','https://basescan.org/token/'+report.address),link('DEX Screener ↗','https://dexscreener.com/base/'+report.address),link('Check spender exposure ↗','/verify?token='+encodeURIComponent(report.address)+'#exposure'));
  const save=button(record?'Rescan and compare ↻':'Save dated evidence record ↗',async self=>{
   self.disabled=true;self.textContent='Checking and recording...';
   try{
